@@ -6,14 +6,26 @@ include 'includes/header.php';
 
 <style>
     /* Power Flow Styles */
-    .flow-dot { stroke-dasharray: 4, 10; stroke: #fff; stroke-width: 2; fill: none; animation: dash 5s linear infinite; opacity: 0; }
+    .flow-dot { stroke-dasharray: 4, 10; stroke: #fff; stroke-width: 2; fill: none; animation: dash 5s linear infinite; opacity: 0; transition: opacity 0.5s; }
     .flow-active { opacity: 1; }
     @keyframes dash { to { stroke-dashoffset: -100; } }
     .flow-reverse { animation-direction: reverse; }
-    .node-circle { fill: #0b0f1a; stroke-width: 2; transition: all 0.5s; }
+    .node-circle { fill: #0b0f1a; stroke-width: 2; transition: all 0.5s; cursor: pointer; }
+    .node-circle:hover { stroke-width: 4; filter: brightness(1.2); }
     .node-label { font-size: 8px; font-weight: 800; fill: #9ca3af; text-anchor: middle; pointer-events: none; }
     .node-value { font-size: 11px; font-weight: 900; fill: #fff; text-anchor: middle; pointer-events: none; }
     .flow-container { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 2rem; padding: 1.5rem; }
+    
+    /* Pulsing Glow Animations */
+    @keyframes glow-orange { 0%, 100% { filter: drop-shadow(0 0 5px rgba(249, 115, 22, 0.4)); } 50% { filter: drop-shadow(0 0 15px rgba(249, 115, 22, 0.8)); } }
+    @keyframes glow-green { 0%, 100% { filter: drop-shadow(0 0 5px rgba(34, 197, 94, 0.4)); } 50% { filter: drop-shadow(0 0 15px rgba(34, 197, 94, 0.8)); } }
+    @keyframes glow-red { 0%, 100% { filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.4)); } 50% { filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.8)); } }
+    @keyframes glow-blue { 0%, 100% { filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.4)); } 50% { filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.8)); } }
+
+    .glow-orange { animation: glow-orange 3s ease-in-out infinite; }
+    .glow-green { animation: glow-green 3s ease-in-out infinite; }
+    .glow-red { animation: glow-red 3s ease-in-out infinite; }
+    .glow-blue { animation: glow-blue 3s ease-in-out infinite; }
     
     /* Animations */
     @keyframes pulse-red { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
