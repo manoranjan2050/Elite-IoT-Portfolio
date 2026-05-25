@@ -1,0 +1,18 @@
+# Database configuration (Strictly Private)
+includes/db.php
+includes/iot_config.php
+
+# Uploaded images (Local content)
+uploads/*
+!uploads/.gitkeep
+
+# System & Environment
+.DS_Store
+Thumbs.db
+node_modules/
+.env
+
+# Custom Admin Init Scripts (Security Risk if left on GitHub)
+init_admin.php
+database_setup.txt
+database_update_only.txt
