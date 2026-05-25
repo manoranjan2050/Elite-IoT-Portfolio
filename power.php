@@ -33,7 +33,7 @@ include 'includes/header.php';
             
             <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
                 <div>
-                    <h1 class="text-5xl font-extrabold mb-4"><span class="text-gradient">Professional IoT Lab</span></h1>
+                    <h1 class="text-5xl font-extrabold mb-4"><span class="text-gradient">Live Power Station</span></h1>
                     <p class="text-gray-400 text-lg">Multi-site Live Energy Telemetry & Systems</p>
                 </div>
                 <div class="flex items-center gap-3 bg-green-500/10 text-green-500 px-4 py-2 rounded-full border border-green-500/20">
