@@ -93,16 +93,16 @@ include 'includes/header.php';
                                 <path d="M150,120 L260,120" class="stroke-gray-800 stroke-[2] fill-none" />
                                 <path id="ov-shop-flow-home" d="M150,120 L260,120" class="flow-dot stroke-red-500" />
                                 
-                                <circle cx="150" cy="30" r="28" class="node-circle stroke-orange-500" />
+                                <circle cx="150" cy="30" onclick="switchTab('shop')" r="28" class="node-circle stroke-orange-500" id="node-shop-solar" />
                                 <text x="150" y="28" class="node-label">SOLAR</text>
                                 <text x="150" y="42" id="ov-shop-val-solar" class="node-value">--W</text>
-                                <circle cx="40" cy="120" r="28" class="node-circle stroke-blue-500" />
+                                <circle cx="40" cy="120" onclick="switchTab('shop')" r="28" class="node-circle stroke-blue-500" />
                                 <text x="40" y="118" class="node-label">GRID</text>
                                 <text x="40" y="132" id="ov-shop-val-grid" class="node-value">--W</text>
-                                <circle cx="150" cy="210" r="28" class="node-circle stroke-green-500" />
+                                <circle cx="150" cy="210" onclick="switchTab('shop')" r="28" class="node-circle stroke-green-500" id="node-shop-battery" />
                                 <text x="150" y="208" class="node-label">STORAGE</text>
                                 <text x="150" y="222" id="ov-shop-val-battery" class="node-value">--%</text>
-                                <circle cx="260" cy="120" r="28" class="node-circle stroke-red-500" />
+                                <circle cx="260" cy="120" onclick="switchTab('shop')" r="28" class="node-circle stroke-red-500" id="node-shop-load" />
                                 <text x="260" y="118" class="node-label">LOAD</text>
                                 <text x="260" y="132" id="ov-shop-val-load" class="node-value">--W</text>
                                 <circle cx="150" cy="120" r="15" class="node-circle stroke-white/10" />
@@ -413,7 +413,9 @@ include 'includes/header.php';
         fetchEntity(entities.shop_pv, null, 'state', (val) => {
             const v = formatVal(val, 0);
             safeUpdateText(['ov-shop-pv', 'ov-shop-val-solar'], v + 'W');
-            toggleFlow('ov-shop-flow-solar', parseFloat(val) > 10);
+            const pwr = parseFloat(val);
+            toggleFlow('ov-shop-flow-solar', pwr > 10, false, pwr);
+            updateNodeGlow('node-shop-solar', pwr > 10, 'glow-orange');
         });
 
         fetchEntity(entities.shop_total_soc, null, 'state', (val) => {
@@ -424,6 +426,7 @@ include 'includes/header.php';
                 const offset = 282.7 - (282.7 * (parseFloat(val) / 100));
                 gauge.style.strokeDashoffset = offset;
             }
+            updateNodeGlow('node-shop-battery', true, 'glow-green');
         });
 
         fetchEntity(entities.shop_total_amps, null, 'state', (val) => {
@@ -442,7 +445,9 @@ include 'includes/header.php';
         fetchEntity(entities.shop_load, null, 'state', (val) => {
             const v = formatVal(val, 0);
             safeUpdateText(['ov-shop-load', 'ov-shop-val-load'], v + 'W');
-            toggleFlow('ov-shop-flow-home', parseFloat(val) > 10);
+            const pwr = parseFloat(val);
+            toggleFlow('ov-shop-flow-home', pwr > 10, false, pwr);
+            updateNodeGlow('node-shop-load', pwr > 10, 'glow-red');
         });
 
         fetchEntity(entities.shop_temp, 'ov-shop-temp', 'state', (val) => safeUpdateText(['ov-shop-temp'], formatVal(val, 1)));
@@ -540,16 +545,28 @@ include 'includes/header.php';
         else { el.textContent = "OFFLINE"; el.className = "text-[8px] px-2 py-1 rounded-full bg-red-500/10 text-red-500 border border-red-500/20"; }
     }
 
-    function toggleFlow(id, active, reverse = false) {
+    function toggleFlow(id, active, reverse = false, wattage = 0) {
         const el = document.getElementById(id);
         if(!el) return;
         if(active) {
             el.classList.add('flow-active');
             if(reverse) el.classList.add('flow-reverse');
             else el.classList.remove('flow-reverse');
+            
+            // --- WATTAGE SPEED CONTROL ---
+            // Base speed is 5s. High wattage (2000W) reduces it to 1s.
+            const speed = Math.max(1, 5 - (Math.abs(wattage) / 500));
+            el.style.animationDuration = speed + 's';
         } else {
             el.classList.remove('flow-active');
         }
+    }
+
+    function updateNodeGlow(id, active, glowClass) {
+        const el = document.getElementById(id);
+        if(!el) return;
+        if(active) el.classList.add(glowClass);
+        else el.classList.remove(glowClass);
     }
 
     async function fetchEntity(entityId, elementId, property, callback = null) {

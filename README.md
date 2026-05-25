@@ -15,6 +15,8 @@ A high-end, futuristic, and fully responsive portfolio ecosystem designed for mu
 
 ### ⚡ Live Energy Command Center (`power.php`)
 A professional-grade monitoring suite for dual-site (Shop & Home) energy systems:
+- **Elite Sync Animations:** Interactive SVG nodes with wattage-based speed control and active glow pulses. Jump between tabs by clicking nodes.
+- **Telegram Alert System:** Automated critical notifications (e.g., high thermal load) sent directly to your phone via a secure bot.
 - **Animated Power Flow:** High-end SVG/CSS visualizations showing real-time energy movement between Solar panels, Grid, Batteries, and Load.
 - **Shop Master Sync:** Advanced multi-pack battery telemetry, featuring per-pack SOC, total Busbar Sync (Amps), and pack health indicators.
 - **System Intelligence:** Dynamic calculation of "Backup Time Remaining" and "Time to Full Charge" with interactive UI animations.
