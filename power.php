@@ -256,6 +256,19 @@ include 'includes/header.php';
 
             <!-- VIEW 3: HOME DETAILS -->
             <div id="view-home" class="view-content hidden space-y-8">
+                
+                <!-- HOME ANALYTICS CHARTS -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="glass p-6 rounded-3xl border-orange-500/10">
+                        <h4 class="text-xs font-bold text-gray-500 uppercase mb-6 tracking-widest text-center">Home PV Generation (24h)</h4>
+                        <canvas id="home-solar-chart" height="150"></canvas>
+                    </div>
+                    <div class="glass p-6 rounded-3xl border-green-500/10">
+                        <h4 class="text-xs font-bold text-gray-500 uppercase mb-6 tracking-widest text-center">Home Storage Level (24h)</h4>
+                        <canvas id="home-soc-chart" height="150"></canvas>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <!-- Column 1: BMS Matrix -->
                     <div class="glass p-10 rounded-3xl border-purple-500/10 flex flex-col justify-center">
@@ -580,6 +593,57 @@ include 'includes/header.php';
                 datasets: [{
                     label: 'Battery SOC (%)',
                     data: [85, 80, 75, 95, 100, 90],
+                    borderColor: '#22c55e',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6b7280' } },
+                    x: { grid: { display: false }, ticks: { color: '#6b7280' } }
+                }
+            }
+        });
+    }
+    const ctxHomeSolar = document.getElementById('home-solar-chart');
+    if (ctxHomeSolar) {
+        new Chart(ctxHomeSolar, {
+            type: 'line',
+            data: {
+                labels: ['12am', '4am', '8am', '12pm', '4pm', '8pm'],
+                datasets: [{
+                    label: 'House PV (Watts)',
+                    data: [0, 0, 200, 1200, 600, 0],
+                    borderColor: '#f97316',
+                    backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6b7280' } },
+                    x: { grid: { display: false }, ticks: { color: '#6b7280' } }
+                }
+            }
+        });
+    }
+
+    const ctxHomeSoc = document.getElementById('home-soc-chart');
+    if (ctxHomeSoc) {
+        new Chart(ctxHomeSoc, {
+            type: 'line',
+            data: {
+                labels: ['12am', '4am', '8am', '12pm', '4pm', '8pm'],
+                datasets: [{
+                    label: 'House SOC (%)',
+                    data: [90, 85, 80, 92, 100, 95],
                     borderColor: '#22c55e',
                     backgroundColor: 'rgba(34, 197, 94, 0.1)',
                     fill: true,
