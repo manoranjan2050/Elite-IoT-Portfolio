@@ -7,6 +7,10 @@ A high-end, futuristic, and fully responsive portfolio ecosystem designed for mu
 ![IoT](https://img.shields.io/badge/IoT-Live_Telemetry-green?style=for-the-badge&logo=homeassistant)
 ![Tailwind](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)
 
+## 🌐 Live Demos
+- **Portfolio Website:** [manoranjan.dev](https://manoranjan.dev)
+- **Energy Command Center:** [manoranjan.dev/power.php](https://manoranjan.dev/power.php)
+
 ## ✨ Elite Features
 
 ### ⚡ Live Energy Command Center (`power.php`)
