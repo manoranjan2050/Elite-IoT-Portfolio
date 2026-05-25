@@ -36,6 +36,30 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, [
 $response = curl_exec($ch);
 $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+// --- TELEGRAM ALERT TRIGGER ---
+if ($http_code == 200 && $response) {
+    $data = json_decode($response, true);
+    if (isset($data['state'])) {
+        $state = (float)$data['state'];
+        
+        // Example: Shop Battery Temp Alert
+        if ($entity_id == 'sensor.flin_energy_battery_temperature' && $state > 37) {
+            require_once '../includes/functions.php';
+            // Simple session-based anti-spam (preventing alerts every 15s)
+            if (!isset($_SESSION['last_alert_time']) || (time() - $_SESSION['last_alert_time'] > 1800)) {
+                $msg = "<b>⚠️ CRITICAL POWER ALERT</b>\n\n";
+                $msg .= "Site: <b>Shop Power Station</b>\n";
+                $msg .= "Type: <b>High Thermal Load</b>\n";
+                $msg .= "Temp: <b>" . $state . "°C</b>\n";
+                $msg .= "Time: " . date('Y-m-d H:i:s');
+                sendTelegram($msg);
+                $_SESSION['last_alert_time'] = time();
+            }
+        }
+    }
+}
+// ------------------------------
+
 if (curl_errno($ch)) {
     echo json_encode(['error' => curl_error($ch)]);
 } else {

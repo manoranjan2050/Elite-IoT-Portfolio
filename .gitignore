@@ -1,6 +1,7 @@
 # Database configuration (Strictly Private)
 includes/db.php
 includes/iot_config.php
+includes/telegram_config.php
 
 # Uploaded images (Local content)
 uploads/*

@@ -53,6 +53,14 @@ include 'includes/header.php';
                 </div>
             </div>
 
+            <!-- LIVE ALERT BAR -->
+            <div id="live-alert-bar" class="hidden mb-8 p-4 bg-red-600/20 border border-red-600/50 rounded-2xl animate-pulse">
+                <p class="text-red-500 font-bold text-center flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span id="alert-message">CRITICAL ALERT</span>
+                </p>
+            </div>
+
             <!-- VIEW 1: OVERVIEW -->
             <div id="view-overview" class="view-content space-y-12">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -171,6 +179,19 @@ include 'includes/header.php';
 
             <!-- VIEW 2: SHOP DETAILS -->
             <div id="view-shop" class="view-content hidden space-y-8">
+                
+                <!-- SHOP ANALYTICS CHARTS -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="glass p-6 rounded-3xl border-orange-500/10">
+                        <h4 class="text-xs font-bold text-gray-500 uppercase mb-6 tracking-widest text-center">Solar Generation (24h)</h4>
+                        <canvas id="shop-solar-chart" height="150"></canvas>
+                    </div>
+                    <div class="glass p-6 rounded-3xl border-green-500/10">
+                        <h4 class="text-xs font-bold text-gray-500 uppercase mb-6 tracking-widest text-center">Battery Storage Level (24h)</h4>
+                        <canvas id="shop-soc-chart" height="150"></canvas>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Column 1: Master Health -->
                     <div class="lg:col-span-1 space-y-6">
@@ -442,7 +463,20 @@ include 'includes/header.php';
         fetchEntity(entities.home_amps, 'ov-home-amps', 'state', (val) => safeUpdateText('ov-home-amps', formatVal(val, 1)));
         fetchEntity(entities.home_p, 'det-home-p', 'state', (val) => safeUpdateText('det-home-p', formatVal(val, 0)));
         fetchEntity(entities.home_grid, 'det-home-grid', 'state', (val) => safeUpdateText('det-home-grid', formatVal(val, 0)));
-        fetchEntity(entities.home_temp, null, 'state', (val) => safeUpdateText(['ov-home-temp', 'det-home-temp'], formatVal(val, 1)));
+        fetchEntity(entities.shop_temp, null, 'state', (val) => {
+            const temp = parseFloat(val);
+            safeUpdateText(['ov-shop-temp', 'shop-temp'], formatVal(val, 1));
+
+            // --- LIVE ALERT LOGIC ---
+            const alertBar = document.getElementById('live-alert-bar');
+            const alertMsg = document.getElementById('alert-message');
+            if (temp > 37) {
+                alertBar.classList.remove('hidden');
+                alertMsg.textContent = `⚠️ CRITICAL: High Thermal Load at Shop (${formatVal(val, 1)}°C)`;
+            } else {
+                alertBar.classList.add('hidden');
+            }
+        });
         fetchEntity(entities.home_delta, 'det-home-delta', 'state', (val) => safeUpdateText('det-home-delta', (parseFloat(val) * 1000).toFixed(0)));
 
         // 5. GLOBAL FLOWS
@@ -509,6 +543,59 @@ include 'includes/header.php';
 
     updateDashboard();
     setInterval(updateDashboard, 15000);
+
+    // --- CHART.JS ANALYTICS ---
+    const ctxSolar = document.getElementById('shop-solar-chart');
+    if (ctxSolar) {
+        new Chart(ctxSolar, {
+            type: 'line',
+            data: {
+                labels: ['12am', '4am', '8am', '12pm', '4pm', '8pm'],
+                datasets: [{
+                    label: 'Solar PV (Watts)',
+                    data: [0, 0, 150, 800, 450, 0],
+                    borderColor: '#f97316',
+                    backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6b7280' } },
+                    x: { grid: { display: false }, ticks: { color: '#6b7280' } }
+                }
+            }
+        });
+    }
+
+    const ctxSoc = document.getElementById('shop-soc-chart');
+    if (ctxSoc) {
+        new Chart(ctxSoc, {
+            type: 'line',
+            data: {
+                labels: ['12am', '4am', '8am', '12pm', '4pm', '8pm'],
+                datasets: [{
+                    label: 'Battery SOC (%)',
+                    data: [85, 80, 75, 95, 100, 90],
+                    borderColor: '#22c55e',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6b7280' } },
+                    x: { grid: { display: false }, ticks: { color: '#6b7280' } }
+                }
+            }
+        });
+    }
 </script>
 
 <?php include 'includes/footer.php'; ?>
