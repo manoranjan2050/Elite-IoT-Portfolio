@@ -94,6 +94,12 @@ Run `db_migrate.php` to apply all schema changes without phpMyAdmin:
 
 ---
 
+## Recent Updates
+
+- Migrated from the Tailwind CDN script to a locally compiled, minified static stylesheet for production performance.
+- Blog CMS is now fully wired end-to-end with a working post detail page (`post.php`).
+- Gallery page seeded with real app/project screenshots.
+
 ## 🛠️ Tech Stack
 
 | Layer | Technologies |
