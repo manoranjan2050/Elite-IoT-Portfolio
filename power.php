@@ -780,6 +780,7 @@ include 'includes/header.php';
                             <div class="text-center p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                                 <p class="text-[9px] text-gray-500 uppercase mb-1.5 tracking-wide">Power</p>
                                 <span id="det-shop-bank-pwr" class="text-base font-black text-white">--</span>
+                                <p id="det-shop-bank-pwr-dir" class="text-[8px] font-bold uppercase tracking-wide mt-0.5"></p>
                             </div>
                             <div class="text-center p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                                 <p class="text-[9px] text-gray-500 uppercase mb-1.5 tracking-wide">SOH</p>
@@ -1060,6 +1061,9 @@ include 'includes/header.php';
         } catch(e) {}
     }
 
+    // Latest known min/max cell voltage per pack, filled in by fetchPackCells()
+    const packCellStats = {};
+
     // LiFePO4 cell voltage -> fill % and color (2.80V empty .. 3.65V full)
     function cellVoltToVisual(v) {
         const MIN = 2.80, MAX = 3.65;
@@ -1103,6 +1107,7 @@ include 'includes/header.php';
         const nums = results.map(r => r && !r.error ? parseFloat(r.state) : NaN).filter(n => Number.isFinite(n));
         const max = nums.length ? Math.max(...nums) : null;
         const min = nums.length ? Math.min(...nums) : null;
+        packCellStats[prefix] = { min, max };
         results.forEach((r, idx) => {
             const i = idx + 1;
             const fillEl  = document.getElementById(`${containerId}-c${i}-fill`);
@@ -1130,18 +1135,44 @@ include 'includes/header.php';
         if (!badge || !list) return;
 
         const checks = [];
-        const p1Link = await fetch(`api/ha_proxy.php?entity=${entities.shop_p1_link}&_t=${Date.now()}`).then(r=>r.json()).catch(()=>null);
-        const p2Link = await fetch(`api/ha_proxy.php?entity=${entities.shop_p2_link}&_t=${Date.now()}`).then(r=>r.json()).catch(()=>null);
-        const p1Delta = await fetch(`api/ha_proxy.php?entity=${entities.shop_p1_delta}&_t=${Date.now()}`).then(r=>r.json()).catch(()=>null);
-        const p2Delta = await fetch(`api/ha_proxy.php?entity=${entities.shop_p2_delta}&_t=${Date.now()}`).then(r=>r.json()).catch(()=>null);
+        const fetchState = (id) => fetch(`api/ha_proxy.php?entity=${id}&_t=${Date.now()}`).then(r=>r.json()).catch(()=>null);
+        const asNum = (r) => r && !r.error ? parseFloat(r.state) : NaN;
+
+        const [p1Link, p2Link, p1Delta, p2Delta,
+               p1T1, p1T2, p1Tmos, p2T1, p2T2, p2Tmos,
+               p1Soh, p2Soh] = await Promise.all([
+            fetchState(entities.shop_p1_link), fetchState(entities.shop_p2_link),
+            fetchState(entities.shop_p1_delta), fetchState(entities.shop_p2_delta),
+            fetchState(entities.shop_p1_t1), fetchState(entities.shop_p1_t2), fetchState(entities.shop_p1_tmos),
+            fetchState(entities.shop_p2_t1), fetchState(entities.shop_p2_t2), fetchState(entities.shop_p2_tmos),
+            fetchState(entities.shop_p1_soh), fetchState(entities.shop_p2_soh),
+        ]);
 
         checks.push({ ok: p1Link && p1Link.state === 'on', label: 'Pack 1 BMS communication' });
         checks.push({ ok: p2Link && p2Link.state === 'on', label: 'Pack 2 BMS communication' });
 
-        const d1 = p1Delta && !p1Delta.error ? parseFloat(p1Delta.state) : NaN;
-        const d2 = p2Delta && !p2Delta.error ? parseFloat(p2Delta.state) : NaN;
+        const d1 = asNum(p1Delta), d2 = asNum(p2Delta);
         checks.push({ ok: !Number.isFinite(d1) || d1 < 0.05, label: 'Pack 1 cell balance (Δ < 0.05V)' });
         checks.push({ ok: !Number.isFinite(d2) || d2 < 0.05, label: 'Pack 2 cell balance (Δ < 0.05V)' });
+
+        // Temperature safety (0-45°C safe operating range for LiFePO4)
+        const tempOk = (t) => !Number.isFinite(t) || (t >= 0 && t <= 45);
+        const temps1 = [asNum(p1T1), asNum(p1T2), asNum(p1Tmos)];
+        const temps2 = [asNum(p2T1), asNum(p2T2), asNum(p2Tmos)];
+        checks.push({ ok: temps1.every(tempOk), label: 'Pack 1 temperature in safe range (0-45°C)' });
+        checks.push({ ok: temps2.every(tempOk), label: 'Pack 2 temperature in safe range (0-45°C)' });
+
+        // State of health
+        const soh1 = asNum(p1Soh), soh2 = asNum(p2Soh);
+        checks.push({ ok: !Number.isFinite(soh1) || soh1 >= 80, label: 'Pack 1 health (SOH ≥ 80%)' });
+        checks.push({ ok: !Number.isFinite(soh2) || soh2 >= 80, label: 'Pack 2 health (SOH ≥ 80%)' });
+
+        // Individual cell voltage extremes (from the last cell-grid fetch)
+        const s1 = packCellStats['jk_bms_1_100ah_bms1'];
+        const s2 = packCellStats['jk_bms_2_100ah_bms2'];
+        const cellOk = (v) => v == null || (v >= 2.90 && v <= 3.60);
+        checks.push({ ok: !s1 || (cellOk(s1.min) && cellOk(s1.max)), label: 'Pack 1 all cells within 2.90-3.60V' });
+        checks.push({ ok: !s2 || (cellOk(s2.min) && cellOk(s2.max)), label: 'Pack 2 all cells within 2.90-3.60V' });
 
         const allOk = checks.every(c => c.ok);
         badge.textContent = allOk ? '✓ ALL SYSTEMS OK' : '⚠ ISSUES FOUND';
@@ -1425,7 +1456,16 @@ include 'includes/header.php';
         fetchEntity(entities.shop_bank_soc,    (v) => setText('det-shop-bank-soc', fmt(v,0)+'%'));
         fetchEntity(entities.shop_bank_v,      (v) => setText('det-shop-bank-v', fmt(v,2)+'V'));
         fetchEntity(entities.shop_bank_amps,   (v) => setText('det-shop-bank-amps', fmt(v,1)+'A'));
-        fetchEntity(entities.shop_bank_pwr,    (v) => setText('det-shop-bank-pwr', fmt(v,0)+'W'));
+        fetchEntity(entities.shop_bank_pwr,    (v) => {
+            setText('det-shop-bank-pwr', fmt(v,0)+'W');
+            const dirEl = document.getElementById('det-shop-bank-pwr-dir');
+            if (dirEl) {
+                const p = parseFloat(v) || 0;
+                dirEl.textContent = p < -5 ? 'Discharging' : p > 5 ? 'Charging' : 'Idle';
+                dirEl.className = 'text-[8px] font-bold uppercase tracking-wide mt-0.5 ' +
+                    (p < -5 ? 'text-orange-400' : p > 5 ? 'text-green-400' : 'text-gray-600');
+            }
+        });
         fetchEntity(entities.shop_bank_soh,    (v) => setText('det-shop-bank-soh', fmt(v,0)+'%'));
         fetchEntity(entities.shop_bank_design, (v) => setText('det-shop-bank-design', fmt(v,0)+'Ah'));
         fetchEntity(entities.shop_bank_remain, (v) => setText('det-shop-bank-remain', fmt(v,0)+'Ah'));
