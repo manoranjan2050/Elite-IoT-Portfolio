@@ -43,6 +43,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $pdo->prepare("DELETE FROM gallery WHERE id = ?")->execute([$id]);
         $flash = ['type' => 'success', 'text' => 'Image deleted.'];
+    } elseif (isset($_POST['toggle_visible_id'])) {
+        $id = (int) $_POST['toggle_visible_id'];
+        $pdo->prepare("UPDATE gallery SET show_in_gallery = 1 - show_in_gallery WHERE id = ?")->execute([$id]);
+        // AJAX request from the card toggle - just confirm, no full page flash needed
+        if (!empty($_POST['ajax'])) {
+            $stmt = $pdo->prepare("SELECT show_in_gallery FROM gallery WHERE id = ?");
+            $stmt->execute([$id]);
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true, 'show_in_gallery' => (int) $stmt->fetchColumn()]);
+            exit;
+        }
     }
 }
 
@@ -99,8 +110,20 @@ $items = $pdo->query("SELECT * FROM gallery ORDER BY display_order ASC, created_
                 <?php else: ?>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
                     <?php foreach ($items as $item): ?>
-                    <div class="relative group rounded-xl overflow-hidden border border-gray-800 aspect-square">
-                        <img src="../<?php echo htmlspecialchars($item['image_url']); ?>" class="w-full h-full object-cover">
+                    <div class="relative group rounded-xl overflow-hidden border border-gray-800 aspect-square" id="gallery-card-<?php echo $item['id']; ?>">
+                        <img src="../<?php echo htmlspecialchars($item['image_url']); ?>" class="w-full h-full object-cover <?php echo $item['show_in_gallery'] ? '' : 'opacity-40 grayscale'; ?>" id="gallery-img-<?php echo $item['id']; ?>">
+
+                        <!-- Visibility toggle - always visible, top-right -->
+                        <div class="absolute top-1.5 right-1.5 flex items-center gap-1 px-1.5 py-1 rounded-lg bg-black/70 backdrop-blur-sm">
+                            <span class="text-[8px] font-bold uppercase <?php echo $item['show_in_gallery'] ? 'text-green-400' : 'text-gray-500'; ?>" id="gallery-visible-label-<?php echo $item['id']; ?>">
+                                <?php echo $item['show_in_gallery'] ? 'Live' : 'Hidden'; ?>
+                            </span>
+                            <label class="toggle-switch toggle-switch-sm">
+                                <input type="checkbox" onchange="toggleGalleryVisible(<?php echo $item['id']; ?>, this)" <?php echo $item['show_in_gallery'] ? 'checked' : ''; ?>>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
                         <div class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center gap-2 p-2">
                             <span class="text-[10px] px-2 py-0.5 rounded-full <?php echo $item['category'] === 'project' ? 'bg-purple-500/30 text-purple-300' : 'bg-blue-500/30 text-blue-300'; ?>">
                                 <?php echo ucfirst($item['category']); ?>
@@ -122,5 +145,33 @@ $items = $pdo->query("SELECT * FROM gallery ORDER BY display_order ASC, created_
             </div>
         </div>
     </div>
+
+<script>
+async function toggleGalleryVisible(id, checkbox) {
+    const img = document.getElementById('gallery-img-' + id);
+    const label = document.getElementById('gallery-visible-label-' + id);
+    checkbox.disabled = true;
+    try {
+        const res = await fetch(location.href, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'toggle_visible_id=' + id + '&ajax=1'
+        });
+        const data = await res.json();
+        if (data.success) {
+            const visible = data.show_in_gallery === 1;
+            checkbox.checked = visible;
+            if (img) img.className = 'w-full h-full object-cover' + (visible ? '' : ' opacity-40 grayscale');
+            if (label) {
+                label.textContent = visible ? 'Live' : 'Hidden';
+                label.className = 'text-[8px] font-bold uppercase ' + (visible ? 'text-green-400' : 'text-gray-500');
+            }
+        }
+    } catch (e) {
+        checkbox.checked = !checkbox.checked; // revert on failure
+    }
+    checkbox.disabled = false;
+}
+</script>
 
 <?php include 'includes/admin_footer.php'; ?>

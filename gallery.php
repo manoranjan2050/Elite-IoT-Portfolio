@@ -1,7 +1,7 @@
 <?php
 require_once 'includes/db.php';
 try {
-    $galleryItems = $pdo->query("SELECT * FROM gallery ORDER BY display_order ASC, created_at DESC")->fetchAll();
+    $galleryItems = $pdo->query("SELECT * FROM gallery WHERE show_in_gallery = 1 ORDER BY display_order ASC, created_at DESC")->fetchAll();
 } catch (Exception $e) {
     $galleryItems = [];
 }
