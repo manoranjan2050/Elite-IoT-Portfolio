@@ -99,7 +99,7 @@ Run `db_migrate.php` to apply all schema changes without phpMyAdmin:
 | Layer | Technologies |
 |---|---|
 | Backend | PHP 8.x, PDO MySQL |
-| Frontend | HTML5, Tailwind CSS (CDN), Vanilla JS, SVG |
+| Frontend | HTML5, Tailwind CSS (compiled, static build), Vanilla JS, SVG |
 | Charts | Chart.js (with gradient fills) |
 | IoT | Home Assistant REST API, cURL |
 | Auth | bcrypt (`password_hash`/`password_verify`), PHP sessions |
