@@ -94,6 +94,41 @@ include 'includes/header.php';
     .batt-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.06); overflow: hidden; }
     .batt-bar-fill { height: 100%; border-radius: 3px; transition: width 1.2s cubic-bezier(.4,0,.2,1); }
 
+    /* ── Mini animated cell battery ── */
+    .cell-batt-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .cell-batt {
+        position: relative;
+        width: 22px; height: 46px;
+        border-radius: 4px 4px 2px 2px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.12);
+        overflow: hidden;
+    }
+    .cell-batt::before {
+        content: '';
+        position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+        width: 10px; height: 4px;
+        background: rgba(255,255,255,0.14);
+        border-radius: 2px 2px 0 0;
+    }
+    .cell-batt-fill {
+        position: absolute; bottom: 0; left: 0; right: 0;
+        height: 0%;
+        transition: height 0.8s cubic-bezier(.4,0,.2,1), background 0.6s ease;
+        background: linear-gradient(180deg, rgba(255,255,255,0.25), transparent 40%), #ef4444;
+    }
+    .cell-batt-fill::after {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(180deg, transparent 60%, rgba(255,255,255,0.12) 100%);
+        animation: cellShimmer 2.4s ease-in-out infinite;
+    }
+    @keyframes cellShimmer { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+    .cell-batt.hi-cell { box-shadow: 0 0 8px rgba(251,146,60,0.6); border-color: rgba(251,146,60,0.5); }
+    .cell-batt.lo-cell { box-shadow: 0 0 8px rgba(96,165,250,0.6); border-color: rgba(96,165,250,0.5); }
+    .cell-batt-volt { font-size: 8px; font-weight: 900; color: #d1d5db; font-variant-numeric: tabular-nums; }
+    .cell-batt-label { font-size: 6px; color: #6b7280; font-weight: 700; text-transform: uppercase; }
+
     /* ── Status badge pulse ── */
     @keyframes pulseBadge { 0%,100%{opacity:1;} 50%{opacity:0.6;} }
     .badge-live { animation: pulseBadge 2s infinite; }
@@ -632,7 +667,7 @@ include 'includes/header.php';
                                         <p class="text-[9px] text-gray-500 uppercase font-bold">16 Cells</p>
                                         <p class="text-[8px] text-gray-600">avg <span id="det-shop-p1-cavg">--</span> · Δ high <span id="det-shop-p1-chigh">--</span> low <span id="det-shop-p1-clow">--</span></p>
                                     </div>
-                                    <div class="grid grid-cols-4 gap-1.5" id="det-shop-p1-cells"></div>
+                                    <div class="grid grid-cols-8 gap-1.5" id="det-shop-p1-cells"></div>
                                 </div>
                             </div>
                         </div>
@@ -717,7 +752,7 @@ include 'includes/header.php';
                                         <p class="text-[9px] text-gray-500 uppercase font-bold">16 Cells</p>
                                         <p class="text-[8px] text-gray-600">avg <span id="det-shop-p2-cavg">--</span> · Δ high <span id="det-shop-p2-chigh">--</span> low <span id="det-shop-p2-clow">--</span></p>
                                     </div>
-                                    <div class="grid grid-cols-4 gap-1.5" id="det-shop-p2-cells"></div>
+                                    <div class="grid grid-cols-8 gap-1.5" id="det-shop-p2-cells"></div>
                                 </div>
                             </div>
                         </div>
@@ -1025,8 +1060,20 @@ include 'includes/header.php';
         } catch(e) {}
     }
 
-    // Fetch all 16 cell voltages for a JK BMS pack and render as a mini bar grid
-    const packCellCache = {};
+    // LiFePO4 cell voltage -> fill % and color (2.80V empty .. 3.65V full)
+    function cellVoltToVisual(v) {
+        const MIN = 2.80, MAX = 3.65;
+        const pct = Math.max(0, Math.min(100, ((v - MIN) / (MAX - MIN)) * 100));
+        let color;
+        if (v < 3.00)      color = '#ef4444'; // red - low
+        else if (v < 3.20) color = '#f97316'; // orange - getting low
+        else if (v < 3.30) color = '#eab308'; // yellow - ok
+        else if (v < 3.45) color = '#22c55e'; // green - healthy
+        else                color = '#38bdf8'; // blue - full / high
+        return { pct, color };
+    }
+
+    // Fetch all 16 cell voltages for a JK BMS pack and render as animated mini batteries
     async function fetchPackCells(prefix, containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -1034,13 +1081,19 @@ include 'includes/header.php';
             container.innerHTML = '';
             for (let i = 1; i <= 16; i++) {
                 const cell = document.createElement('div');
-                cell.className = 'text-center p-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]';
-                cell.innerHTML = `<p class="text-[6px] text-gray-600 uppercase">C${i}</p><p class="text-[9px] font-black text-gray-300" id="${containerId}-c${i}">--</p>`;
+                cell.className = 'cell-batt-wrap';
+                cell.innerHTML = `
+                    <div class="cell-batt" id="${containerId}-c${i}-batt">
+                        <div class="cell-batt-fill" id="${containerId}-c${i}-fill"></div>
+                        <span class="cell-batt-label" style="position:absolute;top:1px;left:0;right:0;text-align:center;">${i}</span>
+                    </div>
+                    <p class="cell-batt-volt" id="${containerId}-c${i}">--</p>
+                `;
                 container.appendChild(cell);
             }
             container.dataset.built = '1';
         }
-        // Parallel fetch all 16 cells, and mark the highest/lowest for at-a-glance imbalance
+        // Parallel fetch all 16 cells, mark the highest/lowest for at-a-glance imbalance
         const results = await Promise.all(
             Array.from({length: 16}, (_, idx) =>
                 fetch(`api/ha_proxy.php?entity=sensor.${prefix}_cell_${idx + 1}&_t=${Date.now()}`)
@@ -1051,12 +1104,22 @@ include 'includes/header.php';
         const max = nums.length ? Math.max(...nums) : null;
         const min = nums.length ? Math.min(...nums) : null;
         results.forEach((r, idx) => {
-            const el = document.getElementById(`${containerId}-c${idx + 1}`);
-            if (!el || !r || r.error) return;
+            const i = idx + 1;
+            const fillEl  = document.getElementById(`${containerId}-c${i}-fill`);
+            const battEl  = document.getElementById(`${containerId}-c${i}-batt`);
+            const voltEl  = document.getElementById(`${containerId}-c${i}`);
+            if (!r || r.error) return;
             const v = parseFloat(r.state);
-            el.textContent = Number.isFinite(v) ? v.toFixed(3) : '--';
-            el.className = 'text-[9px] font-black ' +
-                (v === max ? 'text-orange-400' : v === min ? 'text-blue-400' : 'text-gray-300');
+            if (!Number.isFinite(v)) return;
+
+            if (voltEl) voltEl.textContent = v.toFixed(3);
+            const { pct, color } = cellVoltToVisual(v);
+            if (fillEl) { fillEl.style.height = pct + '%'; fillEl.style.background = `linear-gradient(180deg, rgba(255,255,255,0.25), transparent 40%), ${color}`; }
+            if (battEl) {
+                battEl.classList.remove('hi-cell', 'lo-cell');
+                if (v === max) battEl.classList.add('hi-cell');
+                else if (v === min) battEl.classList.add('lo-cell');
+            }
         });
     }
 
