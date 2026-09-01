@@ -1,0 +1,12 @@
+# Root .htaccess — routes everything into public/ even if the subdomain
+# document root points at the project folder instead of public/.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Belt-and-braces: never serve dotfiles (covers .env)
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>

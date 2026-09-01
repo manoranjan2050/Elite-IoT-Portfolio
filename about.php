@@ -1,6 +1,16 @@
 <?php
 require_once 'includes/db.php';
 $pageTitle = "About Me | Manoranjan";
+$pageDescription = "Manoranjan is a full-stack developer and IoT engineer with 11+ years of experience, running MTP Code.";
+
+$aboutPhoto = 'https://github.com/manoranjan2050.png';
+try {
+    $ap = $pdo->query("SELECT profile_photo FROM admin_users ORDER BY id ASC LIMIT 1")->fetch();
+    if ($ap && $ap['profile_photo']) {
+        $aboutPhoto = 'uploads/' . $ap['profile_photo'];
+    }
+} catch (Exception $e) {}
+
 include 'includes/header.php';
 ?>
 
@@ -15,11 +25,11 @@ include 'includes/header.php';
                             I am <span class="text-white font-bold">Manoranjan</span>, a versatile technologist and entrepreneur with a passion for building systems that bridge the gap between digital logic and physical reality.
                         </p>
                         <p class="text-gray-400 leading-relaxed mb-6">
-                            My journey began as a coder, but my curiosity quickly led me to explore the worlds of hardware through IoT and PCB design, and finance through strategic trading. Today, I balance these disciplines to create innovative solutions for complex problems.
+                            My journey began as a coder, but my curiosity quickly led me to explore the worlds of hardware through IoT and PCB design, and finance through strategic trading. Today, I run <span class="text-white font-bold">MTP Code</span>, balancing these disciplines to create innovative solutions for complex problems.
                         </p>
                     </div>
                     <div class="order-1 md:order-2 flex justify-center">
-                        <img src="https://github.com/manoranjan2050.png" class="w-64 h-64 rounded-3xl object-cover shadow-2xl border-4 border-blue-500/20" alt="Manoranjan">
+                        <img src="<?php echo htmlspecialchars($aboutPhoto); ?>" class="w-64 h-64 rounded-3xl object-cover shadow-2xl border-4 border-blue-500/20" alt="Manoranjan">
                     </div>
                 </div>
 
@@ -28,7 +38,7 @@ include 'includes/header.php';
                         <h3 class="text-2xl font-bold mb-6 text-white">Quick Facts</h3>
                         <ul class="space-y-4 text-gray-400">
                             <li class="flex items-center gap-3">
-                                <i class="fa-solid fa-check text-blue-500"></i> Expert in PHP, Python, and JavaScript.
+                                <i class="fa-solid fa-check text-blue-500"></i> Full-stack developer — Laravel, Next.js, Flutter & Kotlin.
                             </li>
                             <li class="flex items-center gap-3">
                                 <i class="fa-solid fa-check text-blue-500"></i> Custom PCB Design & IoT Prototyping.
@@ -37,7 +47,7 @@ include 'includes/header.php';
                                 <i class="fa-solid fa-check text-blue-500"></i> Data-driven Trading Strategies.
                             </li>
                             <li class="flex items-center gap-3">
-                                <i class="fa-solid fa-check text-blue-500"></i> 5+ Years in Tech Entrepreneurship.
+                                <i class="fa-solid fa-check text-blue-500"></i> 11+ Years in Tech Entrepreneurship.
                             </li>
                         </ul>
                     </div>

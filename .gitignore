@@ -2,6 +2,7 @@
 includes/db.php
 includes/iot_config.php
 includes/telegram_config.php
+includes/mail_config.php
 
 # Uploaded images (Local content)
 uploads/*
@@ -17,3 +18,7 @@ node_modules/
 init_admin.php
 database_setup.txt
 database_update_only.txt
+
+# Env backups (contain live secrets)
+kavach/.env.bak.predeploy
+kavach/.env

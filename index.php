@@ -2,19 +2,30 @@
 require_once 'includes/db.php';
 // Fetch data from DB
 try {
-    $projects = $pdo->query("SELECT * FROM projects ORDER BY created_at DESC")->fetchAll();
+    $projects = $pdo->query("SELECT * FROM projects ORDER BY created_at DESC LIMIT 6")->fetchAll();
+    $totalProjectCount = (int) $pdo->query("SELECT COUNT(*) FROM projects")->fetchColumn();
     $testimonials = $pdo->query("SELECT * FROM testimonials ORDER BY created_at DESC LIMIT 6")->fetchAll();
     $blogs = $pdo->query("SELECT * FROM blogs ORDER BY created_at DESC LIMIT 3")->fetchAll();
 } catch (Exception $e) {
     $projects = $testimonials = $blogs = [];
 }
 
+$heroPhoto = 'https://github.com/manoranjan2050.png';
+try {
+    $hp = $pdo->query("SELECT profile_photo FROM admin_users ORDER BY id ASC LIMIT 1")->fetch();
+    if ($hp && $hp['profile_photo']) {
+        $heroPhoto = 'uploads/' . $hp['profile_photo'];
+    }
+} catch (Exception $e) {}
+
 $pageTitle = "Manoranjan | Developer, Trader, IoT Dev & Businessman";
+$pageDescription = "Manoranjan is a full-stack developer, IoT engineer, and PCB designer building Android apps, web platforms, and smart home tools under MTP Code.";
 include 'includes/header.php';
 ?>
 
     <!-- Hero Section -->
-    <section id="home" class="min-h-screen flex items-center pt-20 px-6">
+    <section id="home" class="min-h-screen flex items-center pt-20 px-6 relative overflow-hidden">
+        <canvas id="hero-dots" class="absolute inset-0 w-full h-full pointer-events-none opacity-70"></canvas>
         <div class="container mx-auto grid md:grid-cols-2 gap-12 items-center">
             <div data-aos="fade-right" data-aos-duration="1000">
                 <h2 class="text-blue-500 font-bold tracking-widest uppercase mb-4">Welcome to my world</h2>
@@ -24,15 +35,21 @@ include 'includes/header.php';
                 <p class="text-xl text-gray-400 mb-8 max-w-lg leading-relaxed">
                     A multi-disciplinary innovator specializing in high-performance coding, strategic trading, IoT solutions, and PCB design. I bridge the gap between hardware and software.
                 </p>
-                <div class="flex flex-wrap gap-4">
+                <div class="flex flex-wrap gap-4 mb-8">
                     <a href="power.php" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full font-bold transition transform hover:scale-105 shadow-lg shadow-blue-500/20">View My Work</a>
                     <a href="contact.php" class="border border-gray-700 hover:bg-gray-800 text-white px-8 py-4 rounded-full font-bold transition">Let's Talk</a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="https://github.com/manoranjan2050" target="_blank" title="GitHub" class="w-11 h-11 glass rounded-xl flex items-center justify-center text-gray-400 hover:text-white hover:-translate-y-1 transition transform"><i class="fa-brands fa-github"></i></a>
+                    <a href="https://linkedin.com/in/manoranjan2050" target="_blank" title="LinkedIn" class="w-11 h-11 glass rounded-xl flex items-center justify-center text-gray-400 hover:text-blue-400 hover:-translate-y-1 transition transform"><i class="fa-brands fa-linkedin"></i></a>
+                    <a href="https://me.developers.google.com/u/manoranjan2050" target="_blank" title="Google Developer Profile" class="w-11 h-11 glass rounded-xl flex items-center justify-center text-gray-400 hover:text-green-400 hover:-translate-y-1 transition transform"><i class="fa-brands fa-google"></i></a>
                 </div>
             </div>
             <div class="relative" data-aos="zoom-in" data-aos-duration="1000">
                 <div class="w-full aspect-square glass rounded-3xl overflow-hidden relative group">
-                    <img src="https://github.com/manoranjan2050.png" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Manoranjan">
+                    <img src="<?php echo htmlspecialchars($heroPhoto); ?>" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt="Manoranjan">
                     <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl"></div>
+                    <div class="absolute -top-6 -left-6 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
                 </div>
             </div>
         </div>
@@ -78,40 +95,21 @@ include 'includes/header.php';
             </div>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <?php foreach ($projects as $project): ?>
-                    <div class="glass rounded-2xl overflow-hidden group hover:scale-[1.02] transition duration-300" data-aos="fade-up">
-                        <div class="h-48 bg-gray-800 relative overflow-hidden">
-                            <?php if ($project['image_url']): ?>
-                                <img src="<?php echo $project['image_url']; ?>" alt="<?php echo $project['title']; ?>" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                            <?php else: ?>
-                                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                                    <i class="fa-solid fa-folder-open text-5xl text-gray-700"></i>
-                                </div>
-                            <?php endif; ?>
-                            <div class="absolute top-4 right-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">
-                                <?php echo $project['category']; ?>
-                            </div>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold mb-2"><?php echo $project['title']; ?></h3>
-                            <p class="text-gray-400 text-sm mb-6 line-clamp-3"><?php echo $project['description']; ?></p>
-                            <div class="flex gap-4">
-                                <?php if ($project['project_link']): ?>
-                                    <a href="<?php echo $project['project_link']; ?>" target="_blank" class="text-blue-400 hover:text-white transition text-sm font-bold"><i class="fa-solid fa-link mr-2"></i>Live Demo</a>
-                                <?php endif; ?>
-                                <?php if ($project['github_link']): ?>
-                                    <a href="<?php echo $project['github_link']; ?>" target="_blank" class="text-gray-400 hover:text-white transition text-sm font-bold"><i class="fa-brands fa-github mr-2"></i>Code</a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
+                <?php foreach ($projects as $i => $project): $aosDelay = ($i % 6) * 60; include 'includes/project-card.php'; endforeach; ?>
                 <?php if (empty($projects)): ?>
                     <div class="glass p-12 rounded-2xl col-span-full text-center border-dashed border-2 border-gray-700">
                         <p class="text-gray-500 italic">Projects are currently being updated.</p>
                     </div>
                 <?php endif; ?>
             </div>
+
+            <?php if ($totalProjectCount > 6): ?>
+            <div class="text-center mt-14" data-aos="fade-up">
+                <a href="projects.php" class="inline-flex items-center gap-2 bg-gray-900 border border-gray-800 hover:border-blue-500 text-white px-8 py-4 rounded-full font-bold transition">
+                    View All <?php echo $totalProjectCount; ?> Projects <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+            <?php endif; ?>
         </div>
     </section>
 
@@ -137,8 +135,8 @@ include 'includes/header.php';
                         <div class="p-6">
                             <span class="text-xs font-bold text-blue-500 uppercase tracking-widest mb-2 block"><?php echo $post['category']; ?></span>
                             <h3 class="text-xl font-bold mb-3"><?php echo $post['title']; ?></h3>
-                            <p class="text-gray-500 text-sm mb-4 line-clamp-3"><?php echo $post['content']; ?></p>
-                            <a href="#" class="text-white font-bold text-sm hover:text-blue-400 transition">Read Article <i class="fa-solid fa-arrow-right ml-2"></i></a>
+                            <p class="text-gray-500 text-sm mb-4 line-clamp-3"><?php echo strip_tags($post['content']); ?></p>
+                            <a href="post.php?id=<?php echo $post['id']; ?>" class="text-white font-bold text-sm hover:text-blue-400 transition">Read Article <i class="fa-solid fa-arrow-right ml-2"></i></a>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -177,6 +175,79 @@ include 'includes/header.php';
             setTimeout(type, typeSpeed);
         }
         type();
+    </script>
+
+    <!-- Interactive Dot-Grid Hero Background -->
+    <script>
+    (function() {
+        const canvas = document.getElementById('hero-dots');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const heroSection = canvas.closest('section');
+
+        let w, h, dots = [];
+        const spacing = 34;
+        const mouse = { x: -9999, y: -9999 };
+
+        function resize() {
+            w = canvas.width = heroSection.offsetWidth;
+            h = canvas.height = heroSection.offsetHeight;
+            dots = [];
+            for (let y = spacing; y < h; y += spacing) {
+                for (let x = spacing; x < w; x += spacing) {
+                    dots.push({ x, y, baseX: x, baseY: y });
+                }
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, w, h);
+            for (const d of dots) {
+                const dx = mouse.x - d.baseX;
+                const dy = mouse.y - d.baseY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const radius = 140;
+
+                let size = 1.4;
+                let alpha = 0.18;
+                let color = '96,165,250'; // blue-400
+
+                if (dist < radius) {
+                    const force = (radius - dist) / radius;
+                    size = 1.4 + force * 3.2;
+                    alpha = 0.18 + force * 0.65;
+                    color = force > 0.5 ? '192,132,252' : '96,165,250'; // purple near cursor, blue further
+
+                    // gentle repel
+                    d.x = d.baseX - dx * force * 0.15;
+                    d.y = d.baseY - dy * force * 0.15;
+                } else {
+                    d.x += (d.baseX - d.x) * 0.1;
+                    d.y += (d.baseY - d.y) * 0.1;
+                }
+
+                ctx.beginPath();
+                ctx.arc(d.x, d.y, size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${color},${alpha})`;
+                ctx.fill();
+            }
+            requestAnimationFrame(draw);
+        }
+
+        heroSection.addEventListener('mousemove', (e) => {
+            const rect = heroSection.getBoundingClientRect();
+            mouse.x = e.clientX - rect.left;
+            mouse.y = e.clientY - rect.top;
+        });
+        heroSection.addEventListener('mouseleave', () => {
+            mouse.x = -9999;
+            mouse.y = -9999;
+        });
+
+        window.addEventListener('resize', resize);
+        resize();
+        draw();
+    })();
     </script>
 
 <?php include 'includes/footer.php'; ?>

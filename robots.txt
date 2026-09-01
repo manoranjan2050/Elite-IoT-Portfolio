@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /uploads/
+Disallow: /includes/
+
+Sitemap: https://manoranjan.dev/sitemap.xml
