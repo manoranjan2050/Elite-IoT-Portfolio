@@ -916,11 +916,11 @@ include 'includes/header.php';
         shop_total_amps: 'sensor.shop_total_current',
         shop_backup:     'sensor.shop_backup_time_remaining',
         shop_to_full:    'sensor.shop_time_to_full_charge',
-        shop_pv:         'sensor.flin_energy_pv_power',
-        shop_load:       'sensor.flin_energy_load_power',
-        shop_temp:       'sensor.flin_energy_battery_temperature',
-        shop_grid:       'sensor.flin_energy_grid_power',
-        shop_batt_pwr:   'sensor.flin_energy_battery_power',
+        shop_pv:         'sensor.flin_fution_inverter_pv_power',
+        shop_load:       'sensor.flin_fution_inverter_ac_out_active_power',
+        shop_temp:       'sensor.battery_bank_200ah_temperature_1',
+        shop_grid:       'sensor.flin_fution_inverter_grid_power',
+        shop_batt_pwr:   'sensor.flin_fution_inverter_battery_power',
         shop_p1_soc:     'sensor.shop_battery_pack_one_shop_bms_state_of_charge',
         shop_p1_amps:    'sensor.shop_battery_pack_one_shop_bms_current',
         shop_p1_delta:   'sensor.shop_battery_pack_one_shop_bms_cell_delta',
@@ -1326,6 +1326,14 @@ include 'includes/header.php';
     // ── Dashboard update ──
     let shopPvVal = 0, homeLoadVal = 0;
 
+    // Combined Total Solar / Total Load top-bar stats - updated from each source's own
+    // callback (not read synchronously) since fetchEntity() is async and fire-and-forget.
+    const combinedTotals = { shopPv: 0, homePv: 0, shopLoad: 0, homeLoad: 0 };
+    function updateCombinedTotals() {
+        setText('stat-total-pv',   Math.round(combinedTotals.shopPv + combinedTotals.homePv));
+        setText('stat-total-load', Math.round(combinedTotals.shopLoad + combinedTotals.homeLoad));
+    }
+
     async function updateDashboard() {
         document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
 
@@ -1337,6 +1345,8 @@ include 'includes/header.php';
             setBar('ov-shop-pv-bar', Math.min(100, shopPvVal / 20));
             updateNodeGlow('node-shop-solar', shopPvVal > 10, 'glow-orange');
             toggleFlow('ov-shop-flow-solar', shopPvVal > 10, false, shopPvVal);
+            combinedTotals.shopPv = shopPvVal;
+            updateCombinedTotals();
         });
 
         // SHOP SOC
@@ -1388,6 +1398,8 @@ include 'includes/header.php';
             setBar('ov-shop-load-bar', Math.min(100, pwr / 30));
             updateNodeGlow('node-shop-load', pwr > 10, 'glow-red');
             toggleFlow('ov-shop-flow-home', pwr > 10, false, pwr);
+            combinedTotals.shopLoad = pwr;
+            updateCombinedTotals();
         });
 
         fetchEntity(entities.shop_temp, (val) => {
@@ -1480,6 +1492,8 @@ include 'includes/header.php';
             setBar('home-pv-bar', Math.min(100, homeLoadVal / 15));
             setBar('ov-home-pv-bar', Math.min(100, homeLoadVal / 30));
             toggleFlow('ov-home-flow-solar', homeLoadVal > 10);
+            combinedTotals.homePv = homeLoadVal;
+            updateCombinedTotals();
         });
 
         fetchEntity(entities.home_soc, (val) => {
@@ -1498,6 +1512,8 @@ include 'includes/header.php';
             setText(['ov-home-load', 'det-home-inv', 'ov-home-val-load'], fmt(val,0)+'W');
             setBar('ov-home-load-bar', Math.min(100, pwr / 30));
             toggleFlow('ov-home-flow-home', pwr > 10);
+            combinedTotals.homeLoad = pwr;
+            updateCombinedTotals();
         });
 
         fetchEntity(entities.home_v,    (v) => setText(['det-home-v','ov-home-v-mini'], fmt(v,1)));
@@ -1527,14 +1543,6 @@ include 'includes/header.php';
         });
         fetchEntity(entities.shop_batt_pwr, (val) => toggleFlow('ov-shop-flow-battery', Math.abs(parseFloat(val)||0) > 10, (parseFloat(val)||0) > 0));
         fetchEntity(entities.home_batt_pwr, (val) => toggleFlow('ov-home-flow-battery', Math.abs(parseFloat(val)||0) > 10, (parseFloat(val)||0) > 0));
-
-        // Combined top stats
-        const shopPv  = parseFloat(document.getElementById('ov-shop-pv')?.textContent) || 0;
-        const homePv  = parseFloat(document.getElementById('ov-home-pv')?.textContent) || 0;
-        const shopLd  = parseFloat(document.getElementById('ov-shop-load')?.textContent) || 0;
-        const homeLd  = parseFloat(document.getElementById('ov-home-load')?.textContent) || 0;
-        setText('stat-total-pv',   (shopPv + homePv).toFixed(0));
-        setText('stat-total-load', (shopLd + homeLd).toFixed(0));
     }
 
     // Draw placeholder gauges immediately (before first fetch)
