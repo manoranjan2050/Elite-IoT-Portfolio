@@ -583,6 +583,57 @@ include 'includes/header.php';
                                         <span id="det-shop-p1-sw-d" class="text-[9px] font-black">--</span>
                                     </div>
                                 </div>
+
+                                <!-- Extra pack stats -->
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">Voltage</p>
+                                        <span id="det-shop-p1-v" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">Power</p>
+                                        <span id="det-shop-p1-pwr" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">SOH</p>
+                                        <span id="det-shop-p1-soh" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">Cycles</p>
+                                        <span id="det-shop-p1-cyc" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">Design Ah</p>
+                                        <span id="det-shop-p1-design" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">Remain Ah</p>
+                                        <span id="det-shop-p1-remain" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">Temp 1</p>
+                                        <span id="det-shop-p1-t1" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">Temp 2</p>
+                                        <span id="det-shop-p1-t2" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">MOSFET</p>
+                                        <span id="det-shop-p1-tmos" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                </div>
+
+                                <!-- 16-cell voltage grid -->
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <p class="text-[9px] text-gray-500 uppercase font-bold">16 Cells</p>
+                                        <p class="text-[8px] text-gray-600">avg <span id="det-shop-p1-cavg">--</span> · Δ high <span id="det-shop-p1-chigh">--</span> low <span id="det-shop-p1-clow">--</span></p>
+                                    </div>
+                                    <div class="grid grid-cols-4 gap-1.5" id="det-shop-p1-cells"></div>
+                                </div>
                             </div>
                         </div>
                         <!-- Pack 2 -->
@@ -617,8 +668,102 @@ include 'includes/header.php';
                                         <span id="det-shop-p2-sw-d" class="text-[9px] font-black">--</span>
                                     </div>
                                 </div>
+
+                                <!-- Extra pack stats -->
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">Voltage</p>
+                                        <span id="det-shop-p2-v" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">Power</p>
+                                        <span id="det-shop-p2-pwr" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">SOH</p>
+                                        <span id="det-shop-p2-soh" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">Cycles</p>
+                                        <span id="det-shop-p2-cyc" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">Design Ah</p>
+                                        <span id="det-shop-p2-design" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">Remain Ah</p>
+                                        <span id="det-shop-p2-remain" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">Temp 1</p>
+                                        <span id="det-shop-p2-t1" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">Temp 2</p>
+                                        <span id="det-shop-p2-t2" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                    <div class="text-center p-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                        <p class="text-[7px] text-gray-500 uppercase mb-1">MOSFET</p>
+                                        <span id="det-shop-p2-tmos" class="text-[10px] font-black text-white">--</span>
+                                    </div>
+                                </div>
+
+                                <!-- 16-cell voltage grid -->
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <p class="text-[9px] text-gray-500 uppercase font-bold">16 Cells</p>
+                                        <p class="text-[8px] text-gray-600">avg <span id="det-shop-p2-cavg">--</span> · Δ high <span id="det-shop-p2-chigh">--</span> low <span id="det-shop-p2-clow">--</span></p>
+                                    </div>
+                                    <div class="grid grid-cols-4 gap-1.5" id="det-shop-p2-cells"></div>
+                                </div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Overall System Check -->
+                    <div class="power-card p-6 mt-6" data-aos="fade-up">
+                        <div class="flex justify-between items-center mb-5">
+                            <h3 class="text-base font-black text-white italic">OVERALL <span class="text-gray-600 text-sm">200Ah Bank</span></h3>
+                            <span id="shop-system-check" class="text-[9px] px-3 py-1.5 rounded-full bg-gray-800 text-gray-500 font-bold uppercase tracking-widest">Checking...</span>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+                            <div class="text-center p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                <p class="text-[7px] text-gray-500 uppercase mb-1">SOC</p>
+                                <span id="det-shop-bank-soc" class="text-xs font-black text-white">--</span>
+                            </div>
+                            <div class="text-center p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                <p class="text-[7px] text-gray-500 uppercase mb-1">Voltage</p>
+                                <span id="det-shop-bank-v" class="text-xs font-black text-white">--</span>
+                            </div>
+                            <div class="text-center p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                <p class="text-[7px] text-gray-500 uppercase mb-1">Current</p>
+                                <span id="det-shop-bank-amps" class="text-xs font-black text-white">--</span>
+                            </div>
+                            <div class="text-center p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                <p class="text-[7px] text-gray-500 uppercase mb-1">Power</p>
+                                <span id="det-shop-bank-pwr" class="text-xs font-black text-white">--</span>
+                            </div>
+                            <div class="text-center p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                <p class="text-[7px] text-gray-500 uppercase mb-1">SOH</p>
+                                <span id="det-shop-bank-soh" class="text-xs font-black text-white">--</span>
+                            </div>
+                            <div class="text-center p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                <p class="text-[7px] text-gray-500 uppercase mb-1">Design</p>
+                                <span id="det-shop-bank-design" class="text-xs font-black text-white">--</span>
+                            </div>
+                            <div class="text-center p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                <p class="text-[7px] text-gray-500 uppercase mb-1">Remaining</p>
+                                <span id="det-shop-bank-remain" class="text-xs font-black text-white">--</span>
+                            </div>
+                            <div class="text-center p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                <p class="text-[7px] text-gray-500 uppercase mb-1">Temp</p>
+                                <span id="det-shop-bank-temp" class="text-xs font-black text-white">--</span>
+                            </div>
+                        </div>
+                        <ul id="shop-check-list" class="mt-4 space-y-1.5 text-xs"></ul>
                     </div>
                 </div>
             </div>
@@ -752,6 +897,47 @@ include 'includes/header.php';
         shop_p2_link:    'binary_sensor.shop_battery_pack_two_shop_2_bms_online_status',
         shop_p2_sw_c:    'switch.shop_battery_pack_two_shop_2_bms_charging_switch',
         shop_p2_sw_d:    'switch.shop_battery_pack_two_shop_2_bms_discharging_switch',
+
+        // Pack 1 - raw JK BMS detail (voltage/power/temps/cycles/capacity + 16 cells)
+        shop_p1_v:       'sensor.jk_bms_1_100ah_bms1_battery_voltage',
+        shop_p1_pwr:     'sensor.jk_bms_1_100ah_bms1_battery_power',
+        shop_p1_soh:     'sensor.jk_bms_1_100ah_bms1_state_of_health',
+        shop_p1_cyc:     'sensor.jk_bms_1_100ah_bms1_cycle_count',
+        shop_p1_design:  'sensor.jk_bms_1_100ah_bms1_design_capacity',
+        shop_p1_remain:  'sensor.jk_bms_1_100ah_bms1_remaining_capacity',
+        shop_p1_t1:      'sensor.jk_bms_1_100ah_bms1_temperature_1',
+        shop_p1_t2:      'sensor.jk_bms_1_100ah_bms1_temperature_2',
+        shop_p1_tmos:    'sensor.jk_bms_1_100ah_bms1_temperature_mos',
+        shop_p1_cavg:    'sensor.jk_bms_1_100ah_bms1_cell_voltage_average',
+        shop_p1_chigh:   'sensor.jk_bms_1_100ah_bms1_cell_voltage_highest',
+        shop_p1_clow:    'sensor.jk_bms_1_100ah_bms1_cell_voltage_lowest',
+
+        // Pack 2 - raw JK BMS detail
+        shop_p2_v:       'sensor.jk_bms_2_100ah_bms2_battery_voltage',
+        shop_p2_pwr:     'sensor.jk_bms_2_100ah_bms2_battery_power',
+        shop_p2_soh:     'sensor.jk_bms_2_100ah_bms2_state_of_health',
+        shop_p2_cyc:     'sensor.jk_bms_2_100ah_bms2_cycle_count',
+        shop_p2_design:  'sensor.jk_bms_2_100ah_bms2_design_capacity',
+        shop_p2_remain:  'sensor.jk_bms_2_100ah_bms2_remaining_capacity',
+        shop_p2_t1:      'sensor.jk_bms_2_100ah_bms2_temperature_1',
+        shop_p2_t2:      'sensor.jk_bms_2_100ah_bms2_temperature_2',
+        shop_p2_tmos:    'sensor.jk_bms_2_100ah_bms2_temperature_mos',
+        shop_p2_cavg:    'sensor.jk_bms_2_100ah_bms2_cell_voltage_average',
+        shop_p2_chigh:   'sensor.jk_bms_2_100ah_bms2_cell_voltage_highest',
+        shop_p2_clow:    'sensor.jk_bms_2_100ah_bms2_cell_voltage_lowest',
+
+        // Combined shop bank (200Ah total) - overall system numbers
+        shop_bank_v:       'sensor.battery_bank_200ah_battery_voltage',
+        shop_bank_amps:    'sensor.battery_bank_200ah_battery_current',
+        shop_bank_pwr:     'sensor.battery_bank_200ah_battery_power',
+        shop_bank_soc:     'sensor.battery_bank_200ah_state_of_charge',
+        shop_bank_soh:     'sensor.battery_bank_200ah_state_of_health',
+        shop_bank_t1:      'sensor.battery_bank_200ah_temperature_1',
+        shop_bank_t2:      'sensor.battery_bank_200ah_temperature_2',
+        shop_bank_tmos:    'sensor.battery_bank_200ah_temperature_mos',
+        shop_bank_design:  'sensor.battery_bank_200ah_total_design_capacity',
+        shop_bank_remain:  'sensor.battery_bank_200ah_total_remaining_capacity',
+
         home_pv:         'sensor.q004719472515009ad05_direct_pv_power',
         home_soc:        'sensor.jkbms_home_bms_state_of_charge',
         home_v:          'sensor.jkbms_home_bms_battery_voltage',
@@ -837,6 +1023,74 @@ include 'includes/header.php';
             const data = await res.json();
             if (!data.error && cb) cb(data.state);
         } catch(e) {}
+    }
+
+    // Fetch all 16 cell voltages for a JK BMS pack and render as a mini bar grid
+    const packCellCache = {};
+    async function fetchPackCells(prefix, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        if (!container.dataset.built) {
+            container.innerHTML = '';
+            for (let i = 1; i <= 16; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'text-center p-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]';
+                cell.innerHTML = `<p class="text-[6px] text-gray-600 uppercase">C${i}</p><p class="text-[9px] font-black text-gray-300" id="${containerId}-c${i}">--</p>`;
+                container.appendChild(cell);
+            }
+            container.dataset.built = '1';
+        }
+        // Parallel fetch all 16 cells, and mark the highest/lowest for at-a-glance imbalance
+        const results = await Promise.all(
+            Array.from({length: 16}, (_, idx) =>
+                fetch(`api/ha_proxy.php?entity=sensor.${prefix}_cell_${idx + 1}&_t=${Date.now()}`)
+                    .then(r => r.json()).catch(() => null)
+            )
+        );
+        const nums = results.map(r => r && !r.error ? parseFloat(r.state) : NaN).filter(n => Number.isFinite(n));
+        const max = nums.length ? Math.max(...nums) : null;
+        const min = nums.length ? Math.min(...nums) : null;
+        results.forEach((r, idx) => {
+            const el = document.getElementById(`${containerId}-c${idx + 1}`);
+            if (!el || !r || r.error) return;
+            const v = parseFloat(r.state);
+            el.textContent = Number.isFinite(v) ? v.toFixed(3) : '--';
+            el.className = 'text-[9px] font-black ' +
+                (v === max ? 'text-orange-400' : v === min ? 'text-blue-400' : 'text-gray-300');
+        });
+    }
+
+    // Overall pass/fail health check for the Shop 200Ah bank
+    async function runShopSystemCheck() {
+        const badge = document.getElementById('shop-system-check');
+        const list = document.getElementById('shop-check-list');
+        if (!badge || !list) return;
+
+        const checks = [];
+        const p1Link = await fetch(`api/ha_proxy.php?entity=${entities.shop_p1_link}&_t=${Date.now()}`).then(r=>r.json()).catch(()=>null);
+        const p2Link = await fetch(`api/ha_proxy.php?entity=${entities.shop_p2_link}&_t=${Date.now()}`).then(r=>r.json()).catch(()=>null);
+        const p1Delta = await fetch(`api/ha_proxy.php?entity=${entities.shop_p1_delta}&_t=${Date.now()}`).then(r=>r.json()).catch(()=>null);
+        const p2Delta = await fetch(`api/ha_proxy.php?entity=${entities.shop_p2_delta}&_t=${Date.now()}`).then(r=>r.json()).catch(()=>null);
+
+        checks.push({ ok: p1Link && p1Link.state === 'on', label: 'Pack 1 BMS communication' });
+        checks.push({ ok: p2Link && p2Link.state === 'on', label: 'Pack 2 BMS communication' });
+
+        const d1 = p1Delta && !p1Delta.error ? parseFloat(p1Delta.state) : NaN;
+        const d2 = p2Delta && !p2Delta.error ? parseFloat(p2Delta.state) : NaN;
+        checks.push({ ok: !Number.isFinite(d1) || d1 < 0.05, label: 'Pack 1 cell balance (Δ < 0.05V)' });
+        checks.push({ ok: !Number.isFinite(d2) || d2 < 0.05, label: 'Pack 2 cell balance (Δ < 0.05V)' });
+
+        const allOk = checks.every(c => c.ok);
+        badge.textContent = allOk ? '✓ ALL SYSTEMS OK' : '⚠ ISSUES FOUND';
+        badge.className = 'text-[9px] px-3 py-1.5 rounded-full font-bold uppercase tracking-widest ' +
+            (allOk ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20');
+
+        list.innerHTML = checks.map(c => `
+            <li class="flex items-center gap-2 ${c.ok ? 'text-gray-500' : 'text-red-400'}">
+                <i class="fa-solid ${c.ok ? 'fa-circle-check text-green-500' : 'fa-triangle-exclamation text-red-500'}"></i>
+                ${c.label}
+            </li>
+        `).join('');
     }
 
     // ── Refresh ring ──
@@ -1072,6 +1326,49 @@ include 'includes/header.php';
         fetchEntity(entities.shop_p2_delta,(v) => setText('det-shop-p2-delta', fmt(v,3)+'V'));
         fetchEntity(entities.shop_p2_sw_c, (v) => updateSwitchUI('det-shop-p2-sw-c', v));
         fetchEntity(entities.shop_p2_sw_d, (v) => updateSwitchUI('det-shop-p2-sw-d', v));
+
+        // SHOP PACKS - extra JK BMS detail
+        fetchEntity(entities.shop_p1_v,      (v) => setText('det-shop-p1-v', fmt(v,2)+'V'));
+        fetchEntity(entities.shop_p1_pwr,    (v) => setText('det-shop-p1-pwr', fmt(v,0)+'W'));
+        fetchEntity(entities.shop_p1_soh,    (v) => setText('det-shop-p1-soh', fmt(v,0)+'%'));
+        fetchEntity(entities.shop_p1_cyc,    (v) => setText('det-shop-p1-cyc', fmt(v,0)));
+        fetchEntity(entities.shop_p1_design, (v) => setText('det-shop-p1-design', fmt(v,0)));
+        fetchEntity(entities.shop_p1_remain, (v) => setText('det-shop-p1-remain', fmt(v,0)));
+        fetchEntity(entities.shop_p1_t1,     (v) => setText('det-shop-p1-t1', fmt(v,1)+'°'));
+        fetchEntity(entities.shop_p1_t2,     (v) => setText('det-shop-p1-t2', fmt(v,1)+'°'));
+        fetchEntity(entities.shop_p1_tmos,   (v) => setText('det-shop-p1-tmos', fmt(v,1)+'°'));
+        fetchEntity(entities.shop_p1_cavg,   (v) => setText('det-shop-p1-cavg', fmt(v,3)+'V'));
+        fetchEntity(entities.shop_p1_chigh,  (v) => setText('det-shop-p1-chigh', fmt(v,3)));
+        fetchEntity(entities.shop_p1_clow,   (v) => setText('det-shop-p1-clow', fmt(v,3)));
+
+        fetchEntity(entities.shop_p2_v,      (v) => setText('det-shop-p2-v', fmt(v,2)+'V'));
+        fetchEntity(entities.shop_p2_pwr,    (v) => setText('det-shop-p2-pwr', fmt(v,0)+'W'));
+        fetchEntity(entities.shop_p2_soh,    (v) => setText('det-shop-p2-soh', fmt(v,0)+'%'));
+        fetchEntity(entities.shop_p2_cyc,    (v) => setText('det-shop-p2-cyc', fmt(v,0)));
+        fetchEntity(entities.shop_p2_design, (v) => setText('det-shop-p2-design', fmt(v,0)));
+        fetchEntity(entities.shop_p2_remain, (v) => setText('det-shop-p2-remain', fmt(v,0)));
+        fetchEntity(entities.shop_p2_t1,     (v) => setText('det-shop-p2-t1', fmt(v,1)+'°'));
+        fetchEntity(entities.shop_p2_t2,     (v) => setText('det-shop-p2-t2', fmt(v,1)+'°'));
+        fetchEntity(entities.shop_p2_tmos,   (v) => setText('det-shop-p2-tmos', fmt(v,1)+'°'));
+        fetchEntity(entities.shop_p2_cavg,   (v) => setText('det-shop-p2-cavg', fmt(v,3)+'V'));
+        fetchEntity(entities.shop_p2_chigh,  (v) => setText('det-shop-p2-chigh', fmt(v,3)));
+        fetchEntity(entities.shop_p2_clow,   (v) => setText('det-shop-p2-clow', fmt(v,3)));
+
+        // Individual cells (16 per pack)
+        fetchPackCells('jk_bms_1_100ah_bms1', 'det-shop-p1-cells');
+        fetchPackCells('jk_bms_2_100ah_bms2', 'det-shop-p2-cells');
+
+        // Overall 200Ah bank
+        fetchEntity(entities.shop_bank_soc,    (v) => setText('det-shop-bank-soc', fmt(v,0)+'%'));
+        fetchEntity(entities.shop_bank_v,      (v) => setText('det-shop-bank-v', fmt(v,2)+'V'));
+        fetchEntity(entities.shop_bank_amps,   (v) => setText('det-shop-bank-amps', fmt(v,1)+'A'));
+        fetchEntity(entities.shop_bank_pwr,    (v) => setText('det-shop-bank-pwr', fmt(v,0)+'W'));
+        fetchEntity(entities.shop_bank_soh,    (v) => setText('det-shop-bank-soh', fmt(v,0)+'%'));
+        fetchEntity(entities.shop_bank_design, (v) => setText('det-shop-bank-design', fmt(v,0)+'Ah'));
+        fetchEntity(entities.shop_bank_remain, (v) => setText('det-shop-bank-remain', fmt(v,0)+'Ah'));
+        fetchEntity(entities.shop_bank_t1,     (v) => setText('det-shop-bank-temp', fmt(v,1)+'°'));
+
+        runShopSystemCheck();
 
         // HOME
         fetchEntity(entities.home_pv, (val) => {
