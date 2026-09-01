@@ -208,7 +208,7 @@ manoranjan.dev/
 
 ## 📄 License
 
-MIT License — see [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](LICENSE) for details. Contributions and issues are welcome.
 
 ---
 
