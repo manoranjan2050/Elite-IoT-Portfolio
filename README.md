@@ -94,12 +94,18 @@ Run `db_migrate.php` to apply all schema changes without phpMyAdmin:
 
 ---
 
+## Recent Updates
+
+- Migrated from the Tailwind CDN script to a locally compiled, minified static stylesheet for production performance.
+- Blog CMS is now fully wired end-to-end with a working post detail page (`post.php`).
+- Gallery page seeded with real app/project screenshots.
+
 ## 🛠️ Tech Stack
 
 | Layer | Technologies |
 |---|---|
 | Backend | PHP 8.x, PDO MySQL |
-| Frontend | HTML5, Tailwind CSS (CDN), Vanilla JS, SVG |
+| Frontend | HTML5, Tailwind CSS (compiled, static build), Vanilla JS, SVG |
 | Charts | Chart.js (with gradient fills) |
 | IoT | Home Assistant REST API, cURL |
 | Auth | bcrypt (`password_hash`/`password_verify`), PHP sessions |
@@ -208,7 +214,7 @@ manoranjan.dev/
 
 ## 📄 License
 
-MIT License — see [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](LICENSE) for details. Contributions and issues are welcome.
 
 ---
 
