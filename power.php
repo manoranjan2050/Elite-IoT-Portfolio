@@ -663,7 +663,7 @@ include 'includes/header.php';
 
                                 <!-- 16-cell voltage grid -->
                                 <div>
-                                    <div class="flex justify-between items-center mb-2">
+                                    <div class="flex flex-wrap justify-between items-center gap-x-2 gap-y-1 mb-2">
                                         <p class="text-[9px] text-gray-500 uppercase font-bold">16 Cells</p>
                                         <p class="text-[8px] text-gray-600">avg <span id="det-shop-p1-cavg">--</span> · Δ high <span id="det-shop-p1-chigh">--</span> low <span id="det-shop-p1-clow">--</span></p>
                                     </div>
@@ -748,7 +748,7 @@ include 'includes/header.php';
 
                                 <!-- 16-cell voltage grid -->
                                 <div>
-                                    <div class="flex justify-between items-center mb-2">
+                                    <div class="flex flex-wrap justify-between items-center gap-x-2 gap-y-1 mb-2">
                                         <p class="text-[9px] text-gray-500 uppercase font-bold">16 Cells</p>
                                         <p class="text-[8px] text-gray-600">avg <span id="det-shop-p2-cavg">--</span> · Δ high <span id="det-shop-p2-chigh">--</span> low <span id="det-shop-p2-clow">--</span></p>
                                     </div>
