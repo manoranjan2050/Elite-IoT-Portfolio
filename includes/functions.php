@@ -1,15 +1,18 @@
 <?php
 session_start();
 
-// Session timeout: 1 hour (3600 seconds)
+// Session timeout: 1 hour (3600 seconds) - only applies to logged-in admin sessions,
+// not public visitors browsing the site
 $timeout = 3600;
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout)) {
-    session_unset();
-    session_destroy();
-    header("Location: ../login.php?timeout=1");
-    exit();
+if (isset($_SESSION['admin_id'])) {
+    if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout)) {
+        session_unset();
+        session_destroy();
+        header("Location: ../login.php?timeout=1");
+        exit();
+    }
+    $_SESSION['last_activity'] = time();
 }
-$_SESSION['last_activity'] = time();
 
 /**
  * Tracks a unique visit per session in the database
