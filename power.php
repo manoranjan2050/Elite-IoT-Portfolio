@@ -759,46 +759,46 @@ include 'includes/header.php';
                     </div>
 
                     <!-- Overall System Check -->
-                    <div class="power-card p-6 mt-6" data-aos="fade-up">
-                        <div class="flex justify-between items-center mb-5">
-                            <h3 class="text-base font-black text-white italic">OVERALL <span class="text-gray-600 text-sm">200Ah Bank</span></h3>
-                            <span id="shop-system-check" class="text-[9px] px-3 py-1.5 rounded-full bg-gray-800 text-gray-500 font-bold uppercase tracking-widest">Checking...</span>
+                    <div class="power-card p-6 md:p-8 mt-6 lg:col-span-3" data-aos="fade-up">
+                        <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
+                            <h3 class="text-lg font-black text-white italic">OVERALL <span class="text-gray-600 text-base">200Ah Bank</span></h3>
+                            <span id="shop-system-check" class="text-[10px] px-3.5 py-2 rounded-full bg-gray-800 text-gray-500 font-bold uppercase tracking-widest">Checking...</span>
                         </div>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-                            <div class="text-center p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                                <p class="text-[7px] text-gray-500 uppercase mb-1">SOC</p>
-                                <span id="det-shop-bank-soc" class="text-xs font-black text-white">--</span>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 md:gap-4">
+                            <div class="text-center p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                <p class="text-[9px] text-gray-500 uppercase mb-1.5 tracking-wide">SOC</p>
+                                <span id="det-shop-bank-soc" class="text-base font-black text-white">--</span>
                             </div>
-                            <div class="text-center p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                                <p class="text-[7px] text-gray-500 uppercase mb-1">Voltage</p>
-                                <span id="det-shop-bank-v" class="text-xs font-black text-white">--</span>
+                            <div class="text-center p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                <p class="text-[9px] text-gray-500 uppercase mb-1.5 tracking-wide">Voltage</p>
+                                <span id="det-shop-bank-v" class="text-base font-black text-white">--</span>
                             </div>
-                            <div class="text-center p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                                <p class="text-[7px] text-gray-500 uppercase mb-1">Current</p>
-                                <span id="det-shop-bank-amps" class="text-xs font-black text-white">--</span>
+                            <div class="text-center p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                <p class="text-[9px] text-gray-500 uppercase mb-1.5 tracking-wide">Current</p>
+                                <span id="det-shop-bank-amps" class="text-base font-black text-white">--</span>
                             </div>
-                            <div class="text-center p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                                <p class="text-[7px] text-gray-500 uppercase mb-1">Power</p>
-                                <span id="det-shop-bank-pwr" class="text-xs font-black text-white">--</span>
+                            <div class="text-center p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                <p class="text-[9px] text-gray-500 uppercase mb-1.5 tracking-wide">Power</p>
+                                <span id="det-shop-bank-pwr" class="text-base font-black text-white">--</span>
                             </div>
-                            <div class="text-center p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                                <p class="text-[7px] text-gray-500 uppercase mb-1">SOH</p>
-                                <span id="det-shop-bank-soh" class="text-xs font-black text-white">--</span>
+                            <div class="text-center p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                <p class="text-[9px] text-gray-500 uppercase mb-1.5 tracking-wide">SOH</p>
+                                <span id="det-shop-bank-soh" class="text-base font-black text-white">--</span>
                             </div>
-                            <div class="text-center p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                                <p class="text-[7px] text-gray-500 uppercase mb-1">Design</p>
-                                <span id="det-shop-bank-design" class="text-xs font-black text-white">--</span>
+                            <div class="text-center p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                <p class="text-[9px] text-gray-500 uppercase mb-1.5 tracking-wide">Design</p>
+                                <span id="det-shop-bank-design" class="text-base font-black text-white">--</span>
                             </div>
-                            <div class="text-center p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                                <p class="text-[7px] text-gray-500 uppercase mb-1">Remaining</p>
-                                <span id="det-shop-bank-remain" class="text-xs font-black text-white">--</span>
+                            <div class="text-center p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                <p class="text-[9px] text-gray-500 uppercase mb-1.5 tracking-wide">Remaining</p>
+                                <span id="det-shop-bank-remain" class="text-base font-black text-white">--</span>
                             </div>
-                            <div class="text-center p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                                <p class="text-[7px] text-gray-500 uppercase mb-1">Temp</p>
-                                <span id="det-shop-bank-temp" class="text-xs font-black text-white">--</span>
+                            <div class="text-center p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                                <p class="text-[9px] text-gray-500 uppercase mb-1.5 tracking-wide">Temp</p>
+                                <span id="det-shop-bank-temp" class="text-base font-black text-white">--</span>
                             </div>
                         </div>
-                        <ul id="shop-check-list" class="mt-4 space-y-1.5 text-xs"></ul>
+                        <div id="shop-check-list" class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
                     </div>
                 </div>
             </div>
@@ -1149,10 +1149,10 @@ include 'includes/header.php';
             (allOk ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20');
 
         list.innerHTML = checks.map(c => `
-            <li class="flex items-center gap-2 ${c.ok ? 'text-gray-500' : 'text-red-400'}">
+            <div class="flex items-center gap-2.5 p-2.5 rounded-lg bg-white/[0.03] border border-white/[0.06] text-xs ${c.ok ? 'text-gray-400' : 'text-red-400'}">
                 <i class="fa-solid ${c.ok ? 'fa-circle-check text-green-500' : 'fa-triangle-exclamation text-red-500'}"></i>
-                ${c.label}
-            </li>
+                <span>${c.label}</span>
+            </div>
         `).join('');
     }
 
