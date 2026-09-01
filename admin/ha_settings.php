@@ -30,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_ha'])) {
         $val = isset($_POST[$field]) ? trim($_POST[$field]) : '';
         saveSetting($pdo, $field, $val);
     }
+    saveSetting($pdo, 'pump_meters_enabled', isset($_POST['pump_meters_enabled']) ? '1' : '0');
     // Also update the iot_config.php file with new values so ha_proxy works immediately
     $ha_url   = sanitize($_POST['ha_url']);
     $ha_token = trim($_POST['ha_token']);
@@ -58,6 +59,7 @@ $ha_token    = getSetting($pdo, 'ha_token', '');
 $ha_enabled  = getSetting($pdo, 'ha_enabled', '1');
 $site_a_name = getSetting($pdo, 'site_a_name', 'Shop');
 $site_b_name = getSetting($pdo, 'site_b_name', 'Home');
+$pump_meters_enabled = getSetting($pdo, 'pump_meters_enabled', '0');
 ?>
 <?php include 'includes/admin_head.php'; ?>
 <?php include 'includes/sidebar.php'; ?>
@@ -97,6 +99,17 @@ $site_b_name = getSetting($pdo, 'site_b_name', 'Home');
                             </div>
                             <label class="toggle-switch">
                                 <input type="checkbox" name="ha_enabled" value="1" <?php echo $ha_enabled ? 'checked' : ''; ?>>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+                            <div>
+                                <p class="text-sm font-bold text-white">Show Pump Meters/Gauges</p>
+                                <p class="text-xs text-gray-500 mt-0.5">hacontrol.php Shop Pump card: show voltage/amps gauges + power/kWh/freq stats. Off = just the START/STOP switch.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" name="pump_meters_enabled" value="1" <?php echo $pump_meters_enabled === '1' ? 'checked' : ''; ?>>
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>

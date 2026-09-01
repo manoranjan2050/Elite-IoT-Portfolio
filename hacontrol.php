@@ -11,6 +11,14 @@ try {
     )->fetchAll();
 } catch(Exception $e) {}
 
+// Whether to show the Shop Pump gauges/stats (admin -> HA Settings). Off by default.
+$pumpMetersEnabled = false;
+try {
+    $st = $pdo->prepare("SELECT setting_value FROM ha_settings WHERE setting_key = 'pump_meters_enabled'");
+    $st->execute();
+    $pumpMetersEnabled = $st->fetchColumn() === '1';
+} catch(Exception $e) {}
+
 // Water pump entity IDs (from user's HA config)
 $pump = [
     'voltage' => 'sensor.shop_waterpump_pump_voltage',
@@ -280,6 +288,7 @@ $otherSwitches = array_filter($controlEntities, fn($e) => $e['entity_type'] === 
 
         <div class="p-4 sm:p-5 md:p-7 space-y-5 md:space-y-6">
 
+            <?php if ($pumpMetersEnabled): ?>
             <!-- Gauges Row -->
             <div class="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6">
                 <div>
@@ -314,6 +323,7 @@ $otherSwitches = array_filter($controlEntities, fn($e) => $e['entity_type'] === 
                     <p class="text-[10px] text-gray-600 mt-0.5">Hz</p>
                 </div>
             </div>
+            <?php endif; ?>
 
             <!-- Pump Status Banner -->
             <div id="pump-status-banner" class="pump-stopped-banner flex items-center gap-3">
@@ -333,12 +343,12 @@ $otherSwitches = array_filter($controlEntities, fn($e) => $e['entity_type'] === 
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <button class="btn-start lock-bounce"
-                        onclick="askPattern('<?php echo $pump['start']; ?>', 'toggle', 'START PUMP', 'start')">
+                        onclick="askPattern('<?php echo $pump['start']; ?>', 'turn_on', 'START PUMP', 'start')">
                         <i class="fa-solid fa-play text-lg"></i>
                         <span>START</span>
                     </button>
                     <button class="btn-stop lock-bounce"
-                        onclick="askPattern('<?php echo $pump['stop']; ?>', 'toggle', 'STOP PUMP', 'stop')">
+                        onclick="askPattern('<?php echo $pump['stop']; ?>', 'turn_on', 'STOP PUMP', 'stop')">
                         <i class="fa-solid fa-stop text-lg"></i>
                         <span>STOP</span>
                     </button>

@@ -128,14 +128,24 @@ $entityType = $entityRow['entity_type'];
 $domain  = null;
 $service = null;
 
+// Resolve the actual HA service from the requested action. The frontend sends
+// 'toggle' for flip-style switches, or an explicit 'turn_on'/'turn_off' for
+// momentary trigger switches (e.g. pump start/stop relays) where the current
+// state must not matter - only 'toggle' would be wrong there.
+function resolveOnOffService(string $action): string {
+    if ($action === 'turn_on')  return 'turn_on';
+    if ($action === 'turn_off') return 'turn_off';
+    return 'toggle';
+}
+
 switch ($entityType) {
     case 'switch':
         $domain = 'switch';
-        $service = ($action === 'turn_on') ? 'turn_on' : 'turn_off';
+        $service = resolveOnOffService($action);
         break;
     case 'light':
         $domain = 'light';
-        $service = ($action === 'turn_on') ? 'turn_on' : 'turn_off';
+        $service = resolveOnOffService($action);
         break;
     case 'automation':
         $domain  = 'automation';
@@ -150,8 +160,7 @@ switch ($entityType) {
         $prefix = explode('.', $entity_id)[0];
         if (in_array($prefix, ['switch', 'light', 'automation', 'scene'])) {
             $domain  = $prefix;
-            $service = ($action === 'turn_on') ? 'turn_on'
-                     : (($action === 'turn_off') ? 'turn_off' : 'trigger');
+            $service = in_array($prefix, ['switch', 'light']) ? resolveOnOffService($action) : 'trigger';
         } else {
             jsonError('Unsupported entity type for control.', 400);
         }
