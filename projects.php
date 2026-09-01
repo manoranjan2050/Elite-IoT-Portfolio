@@ -4,11 +4,11 @@ require_once 'includes/db.php';
 $categoryFilter = $_GET['category'] ?? 'all';
 try {
     if ($categoryFilter !== 'all') {
-        $stmt = $pdo->prepare("SELECT * FROM projects WHERE category = ? ORDER BY created_at DESC");
+        $stmt = $pdo->prepare("SELECT * FROM projects WHERE category = ? ORDER BY (status = 'coming_soon') ASC, created_at DESC");
         $stmt->execute([$categoryFilter]);
         $projects = $stmt->fetchAll();
     } else {
-        $projects = $pdo->query("SELECT * FROM projects ORDER BY created_at DESC")->fetchAll();
+        $projects = $pdo->query("SELECT * FROM projects ORDER BY (status = 'coming_soon') ASC, created_at DESC")->fetchAll();
     }
     $categories = $pdo->query("SELECT DISTINCT category FROM projects ORDER BY category ASC")->fetchAll(PDO::FETCH_COLUMN);
 } catch (Exception $e) {

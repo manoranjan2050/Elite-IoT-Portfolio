@@ -2,7 +2,7 @@
 require_once 'includes/db.php';
 // Fetch data from DB
 try {
-    $projects = $pdo->query("SELECT * FROM projects ORDER BY created_at DESC LIMIT 6")->fetchAll();
+    $projects = $pdo->query("SELECT * FROM projects ORDER BY (status = 'coming_soon') ASC, created_at DESC LIMIT 6")->fetchAll();
     $totalProjectCount = (int) $pdo->query("SELECT COUNT(*) FROM projects")->fetchColumn();
     $testimonials = $pdo->query("SELECT * FROM testimonials ORDER BY created_at DESC LIMIT 6")->fetchAll();
     $blogs = $pdo->query("SELECT * FROM blogs ORDER BY created_at DESC LIMIT 3")->fetchAll();
