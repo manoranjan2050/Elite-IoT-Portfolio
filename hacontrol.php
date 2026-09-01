@@ -22,6 +22,14 @@ $pump = [
     'start'   => 'switch.shop_waterpump_start_pump',
     'stop'    => 'switch.shop_waterpump_stop_pump',
 ];
+
+// Group dynamic switch/light entities into named card sections.
+// Pumps are detected by "pump" in the name; everything else splits by type + site.
+$isPumpEntity = fn($e) => $e['entity_type'] === 'switch' && stripos($e['friendly_name'] ?? $e['entity_key'], 'pump') !== false;
+$homeWaterPump = array_filter($controlEntities, fn($e) => $isPumpEntity($e) && $e['site'] === 'home');
+$shopLights    = array_filter($controlEntities, fn($e) => $e['entity_type'] === 'light' && $e['site'] === 'shop');
+$homeLights    = array_filter($controlEntities, fn($e) => $e['entity_type'] === 'light' && $e['site'] === 'home');
+$otherSwitches = array_filter($controlEntities, fn($e) => $e['entity_type'] === 'switch' && !$isPumpEntity($e));
 ?>
 
 <style>
@@ -167,6 +175,54 @@ $pump = [
     /* ── Lock icon bounce on hover ── */
     @keyframes lock-bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
     .lock-bounce:hover i { animation: lock-bounce 0.6s ease infinite; }
+
+    /* ── Old-model manual rocker switch ── */
+    .old-switch-wrap { width: 56px; height: 84px; margin: 0 auto; }
+    .old-switch {
+        position: relative;
+        width: 56px; height: 84px;
+        background: linear-gradient(145deg, #3a3a3a, #161616);
+        border-radius: 9px;
+        border: 2px solid #000;
+        box-shadow: inset 0 2px 3px rgba(255,255,255,0.08), inset 0 -3px 8px rgba(0,0,0,0.7), 0 4px 10px rgba(0,0,0,0.5);
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+        transition: box-shadow 0.2s;
+    }
+    .old-switch:hover { box-shadow: inset 0 2px 3px rgba(255,255,255,0.08), inset 0 -3px 8px rgba(0,0,0,0.7), 0 4px 14px rgba(59,130,246,0.35); }
+    .old-switch:active .old-switch-rocker { transform: scale(0.97); }
+    .old-switch .sw-label {
+        position: absolute; left: 0; right: 0; text-align: center;
+        font-size: 8px; font-weight: 900; letter-spacing: 0.1em;
+        color: #4b5563; pointer-events: none;
+    }
+    .old-switch .sw-label-on  { top: 6px; }
+    .old-switch .sw-label-off { bottom: 6px; }
+    .old-switch.on .sw-label-on   { color: #22c55e; }
+    .old-switch:not(.on) .sw-label-off { color: #ef4444; }
+    .old-switch-rocker {
+        position: absolute; left: 7px; right: 7px; top: 7px;
+        height: 34px;
+        background: linear-gradient(180deg, #e8e8e8, #a3a3a3);
+        border-radius: 5px;
+        border: 1px solid #7a7a7a;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.55), inset 0 1px 1px rgba(255,255,255,0.7), inset 0 -2px 2px rgba(0,0,0,0.15);
+        transition: top 0.22s cubic-bezier(.34,1.3,.64,1), background 0.22s;
+    }
+    .old-switch.on .old-switch-rocker {
+        top: 43px;
+        background: linear-gradient(180deg, #4ade80, #15803d);
+        border-color: #166534;
+    }
+    .old-switch.locked { opacity: 0.55; cursor: not-allowed; }
+    .old-switch-screw {
+        position: absolute; width: 5px; height: 5px; border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #8a8a8a, #2a2a2a);
+        box-shadow: 0 0.5px 1px rgba(255,255,255,0.3);
+    }
+    .old-switch-screw.tl { top: 4px; left: 4px; }
+    .old-switch-screw.br { bottom: 4px; right: 4px; }
 </style>
 
 <div class="control-page min-h-screen pt-24 md:pt-32 pb-24 px-4 relative overflow-hidden">
@@ -263,72 +319,92 @@ $pump = [
                 <i class="fa-solid fa-water-ladder text-2xl opacity-20" id="banner-icon"></i>
             </div>
 
-            <!-- CONTROL BUTTONS — Pattern Protected -->
+            <!-- CONTROL SWITCH — Pattern Protected -->
             <div>
                 <div class="flex items-center gap-2 mb-3">
                     <i class="fa-solid fa-lock text-gray-600 text-xs"></i>
-                    <p class="text-[10px] text-gray-600 uppercase font-bold tracking-widest">Pattern-protected controls</p>
+                    <p class="text-[10px] text-gray-600 uppercase font-bold tracking-widest">Pattern-protected control</p>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <button class="btn-start lock-bounce"
-                        onclick="askPattern('<?php echo $pump['start']; ?>', 'toggle', 'START PUMP', 'start')">
-                        <i class="fa-solid fa-play text-lg"></i>
-                        <span>START PUMP</span>
-                    </button>
-                    <button class="btn-stop lock-bounce"
-                        onclick="askPattern('<?php echo $pump['stop']; ?>', 'toggle', 'STOP PUMP', 'stop')">
-                        <i class="fa-solid fa-stop text-lg"></i>
-                        <span>STOP PUMP</span>
-                    </button>
+                <div class="old-switch-wrap">
+                    <div class="old-switch lock-bounce" id="oldsw-pump" onclick="togglePump()">
+                        <div class="old-switch-screw tl"></div>
+                        <div class="sw-label sw-label-on">ON</div>
+                        <div class="old-switch-rocker"></div>
+                        <div class="sw-label sw-label-off">OFF</div>
+                        <div class="old-switch-screw br"></div>
+                    </div>
                 </div>
-                <p class="text-[10px] text-gray-700 text-center mt-2">
+                <p class="text-[10px] text-gray-700 text-center mt-3">
                     <i class="fa-solid fa-shield-halved mr-1"></i>
-                    Controls require pattern authentication · Monitoring is public
+                    Flip requires pattern authentication · Monitoring is public
                 </p>
             </div>
         </div>
     </div>
 
-    <?php if (!empty($controlEntities)): ?>
-    <!-- ══════════════════════════════════════════════════
-         DYNAMIC CONTROL ENTITIES
-    ══════════════════════════════════════════════════ -->
+    <?php
+    // Reusable renderer for a group of old-style rocker switch cards
+    function renderSwitchGroup($title, $icon, $iconBg, $subtitle, $entities) {
+        if (empty($entities)) return;
+        ?>
+        <div class="ctrl-section mb-8" data-aos="fade-up">
+            <div class="ctrl-section-header">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl <?php echo $iconBg; ?> flex items-center justify-center">
+                        <i class="<?php echo $icon; ?> text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-black text-white"><?php echo htmlspecialchars($title); ?></h2>
+                        <p class="text-[10px] text-gray-600 uppercase tracking-widest font-bold"><?php echo htmlspecialchars($subtitle); ?></p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-5 md:p-7">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <?php foreach ($entities as $e): $key = htmlspecialchars($e['entity_key']); ?>
+                    <div class="entity-card" id="dyn-card-<?php echo $key; ?>">
+                        <p class="text-xs font-bold text-white mb-3"><?php echo htmlspecialchars($e['friendly_name'] ?? $e['entity_key']); ?></p>
+                        <div class="old-switch-wrap">
+                            <div class="old-switch lock-bounce" id="oldsw-<?php echo $key; ?>"
+                                onclick="askPattern('<?php echo htmlspecialchars($e['entity_id']); ?>', 'toggle', '<?php echo htmlspecialchars($e['friendly_name'] ?? $e['entity_key']); ?>', 'generic')">
+                                <div class="old-switch-screw tl"></div>
+                                <div class="sw-label sw-label-on">ON</div>
+                                <div class="old-switch-rocker"></div>
+                                <div class="sw-label sw-label-off">OFF</div>
+                                <div class="old-switch-screw br"></div>
+                            </div>
+                        </div>
+                        <p class="text-[10px] font-black mt-2" id="dyn-state-<?php echo $key; ?>"><span class="text-gray-500">--</span></p>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+
+    renderSwitchGroup('Home Water Pump', 'fa-solid fa-water', 'bg-blue-500/15 text-blue-400', 'Site B · Water Pump', $homeWaterPump);
+    renderSwitchGroup('Shop Light', 'fa-solid fa-lightbulb', 'bg-yellow-500/15 text-yellow-400', 'Site A · Lighting', $shopLights);
+    renderSwitchGroup('Home Light', 'fa-solid fa-lightbulb', 'bg-yellow-500/15 text-yellow-400', 'Site B · Lighting', $homeLights);
+    renderSwitchGroup('Other Switch', 'fa-solid fa-toggle-on', 'bg-purple-500/15 text-purple-400', 'Everything else', $otherSwitches);
+
+    // Remaining sensors / binary sensors from HA config, unchanged
+    $sensors = array_filter($controlEntities, fn($e) => in_array($e['entity_type'], ['sensor','binary_sensor','other']));
+    if (!empty($sensors)):
+    ?>
     <div class="ctrl-section mb-8" data-aos="fade-up">
         <div class="ctrl-section-header">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-purple-500/15 flex items-center justify-center">
-                    <i class="fa-solid fa-gamepad text-purple-400 text-lg"></i>
+                <div class="w-10 h-10 rounded-xl bg-gray-500/15 flex items-center justify-center">
+                    <i class="fa-solid fa-gauge-high text-gray-400 text-lg"></i>
                 </div>
                 <div>
-                    <h2 class="font-black text-white">More Controls</h2>
-                    <p class="text-[10px] text-gray-600 uppercase tracking-widest font-bold">From HA Entities Config</p>
+                    <h2 class="font-black text-white">Sensors</h2>
+                    <p class="text-[10px] text-gray-600 uppercase tracking-widest font-bold">Read-only monitoring</p>
                 </div>
             </div>
         </div>
         <div class="p-5 md:p-7">
-            <!-- Switches -->
-            <?php $switches = array_filter($controlEntities, fn($e) => in_array($e['entity_type'], ['switch','light'])); ?>
-            <?php if (!empty($switches)): ?>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
-                <?php foreach ($switches as $e): ?>
-                <div class="entity-card" id="dyn-card-<?php echo htmlspecialchars($e['entity_key']); ?>">
-                    <div class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center mx-auto mb-2" id="dyn-icon-<?php echo $e['entity_key']; ?>">
-                        <i class="fa-solid fa-power-off text-gray-500"></i>
-                    </div>
-                    <p class="text-xs font-bold text-white mb-0.5"><?php echo htmlspecialchars($e['friendly_name'] ?? $e['entity_key']); ?></p>
-                    <p class="text-xs font-black mb-2" id="dyn-state-<?php echo $e['entity_key']; ?>"><span class="text-gray-500">--</span></p>
-                    <button onclick="askPattern('<?php echo htmlspecialchars($e['entity_id']); ?>', 'toggle', '<?php echo htmlspecialchars($e['friendly_name'] ?? $e['entity_key']); ?>', 'generic')"
-                        class="w-full py-1.5 rounded-lg text-xs font-bold bg-gray-700 hover:bg-gray-600 text-gray-300 transition">
-                        <i class="fa-solid fa-lock text-[9px] mr-1"></i> Toggle
-                    </button>
-                </div>
-                <?php endforeach; ?>
-            </div>
-            <?php endif; ?>
-
-            <!-- Sensors display -->
-            <?php $sensors = array_filter($controlEntities, fn($e) => in_array($e['entity_type'], ['sensor','binary_sensor','other'])); ?>
-            <?php if (!empty($sensors)): ?>
             <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
                 <?php foreach ($sensors as $e): ?>
                 <div class="entity-card">
@@ -338,7 +414,6 @@ $pump = [
                 </div>
                 <?php endforeach; ?>
             </div>
-            <?php endif; ?>
         </div>
     </div>
     <?php endif; ?>
@@ -608,6 +683,8 @@ function updatePumpStatus(state) {
     const bSub    = document.getElementById('banner-sub');
     const bIcon   = document.getElementById('banner-icon');
 
+    const oldSwPump = document.getElementById('oldsw-pump');
+
     if (state === 'on') {
         // Running
         if(led) { led.className = 'led-green'; }
@@ -619,6 +696,7 @@ function updatePumpStatus(state) {
         if(bTitle) bTitle.style.color = '#22c55e';
         if(bSub) bSub.textContent = 'Pump is active — consuming power';
         if(bIcon) bIcon.className = 'fa-solid fa-water text-2xl text-green-400 opacity-60';
+        if(oldSwPump) oldSwPump.classList.add('on');
     } else if (state === 'off') {
         // Stopped
         if(led) { led.className = 'led-red'; }
@@ -630,9 +708,21 @@ function updatePumpStatus(state) {
         if(bTitle) bTitle.style.color = '#ef4444';
         if(bSub) bSub.textContent = 'Pump is idle — no power draw';
         if(bIcon) bIcon.className = 'fa-solid fa-ban text-2xl text-red-400 opacity-40';
+        if(oldSwPump) oldSwPump.classList.remove('on');
     } else {
         if(led) led.className = 'led-gray';
         if(badgeTxt) badgeTxt.textContent = 'UNKNOWN';
+    }
+}
+
+// Flip the Shop pump switch: choose start or stop entity based on current visual state
+function togglePump() {
+    const sw = document.getElementById('oldsw-pump');
+    const isOn = sw && sw.classList.contains('on');
+    if (isOn) {
+        askPattern(pumpEntities.stop, 'toggle', 'STOP PUMP', 'stop');
+    } else {
+        askPattern(pumpEntities.start, 'toggle', 'START PUMP', 'start');
     }
 }
 
@@ -642,20 +732,18 @@ async function refreshDynamic() {
         const val = await fetchEntity(entityId);
         if (val === null) continue;
         const el = document.getElementById('dyn-state-' + key);
-        if (el) {
-            if (val === 'on') {
-                el.innerHTML = '<span class="text-green-400">ON</span>';
-                const card = document.getElementById('dyn-card-' + key);
-                if (card) card.style.borderColor = 'rgba(34,197,94,0.3)';
-                const icon = document.getElementById('dyn-icon-' + key);
-                if (icon) { icon.className = 'w-10 h-10 rounded-xl bg-green-500/15 flex items-center justify-center mx-auto mb-2'; icon.innerHTML = '<i class="fa-solid fa-power-off text-green-400"></i>'; }
-            } else if (val === 'off') {
-                el.innerHTML = '<span class="text-red-400">OFF</span>';
-                const card = document.getElementById('dyn-card-' + key);
-                if (card) card.style.borderColor = '';
-            } else {
-                el.textContent = val;
-            }
+        const sw = document.getElementById('oldsw-' + key);
+        const card = document.getElementById('dyn-card-' + key);
+        if (val === 'on') {
+            if (el) el.innerHTML = '<span class="text-green-400">ON</span>';
+            if (sw) sw.classList.add('on');
+            if (card) card.style.borderColor = 'rgba(34,197,94,0.3)';
+        } else if (val === 'off') {
+            if (el) el.innerHTML = '<span class="text-red-400">OFF</span>';
+            if (sw) sw.classList.remove('on');
+            if (card) card.style.borderColor = '';
+        } else if (el) {
+            el.textContent = val;
         }
     }
 }
