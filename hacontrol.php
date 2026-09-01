@@ -53,6 +53,19 @@ $shopLightsExtra = [
 $shopLights = array_merge($shopLights, $shopLightsExtra);
 $homeLights    = array_filter($controlEntities, fn($e) => $e['entity_type'] === 'light' && $e['site'] === 'home');
 $otherSwitches = array_filter($controlEntities, fn($e) => $e['entity_type'] === 'switch' && !$isPumpEntity($e));
+
+// Give battery charge/discharge switches a meaningful icon instead of the generic toggle icon
+$otherSwitches = array_map(function ($e) {
+    $name = strtolower($e['friendly_name'] ?? $e['entity_key']);
+    if (str_contains($name, 'charge') && !str_contains($name, 'discharge')) {
+        $e['icon']  = 'fa-solid fa-bolt';
+        $e['color'] = 'green';
+    } elseif (str_contains($name, 'discharge')) {
+        $e['icon']  = 'fa-solid fa-battery-quarter';
+        $e['color'] = 'orange';
+    }
+    return $e;
+}, $otherSwitches);
 ?>
 
 <style>
