@@ -23,6 +23,12 @@ $pump = [
     'stop'    => 'switch.shop_waterpump_stop_pump',
 ];
 
+// Grid Control Center - inverter grid-connection switches
+$gridSwitches = [
+    ['entity_key' => 'inverter_one_grid', 'entity_id' => 'switch.inverter_one_grid_connection', 'friendly_name' => 'Inverter ONE'],
+    ['entity_key' => 'inverter_two_grid', 'entity_id' => 'switch.inverter_two_inverter_two_grid', 'friendly_name' => 'Inverter TWO'],
+];
+
 // Group dynamic switch/light entities into named card sections.
 // Pumps are detected by "pump" in the name; everything else splits by type + site.
 $isPumpEntity = fn($e) => $e['entity_type'] === 'switch' && stripos($e['friendly_name'] ?? $e['entity_key'], 'pump') !== false;
@@ -319,24 +325,27 @@ $otherSwitches = array_filter($controlEntities, fn($e) => $e['entity_type'] === 
                 <i class="fa-solid fa-water-ladder text-2xl opacity-20" id="banner-icon"></i>
             </div>
 
-            <!-- CONTROL SWITCH — Pattern Protected -->
+            <!-- CONTROL BUTTONS — Pattern Protected -->
             <div>
                 <div class="flex items-center gap-2 mb-3">
                     <i class="fa-solid fa-lock text-gray-600 text-xs"></i>
-                    <p class="text-[10px] text-gray-600 uppercase font-bold tracking-widest">Pattern-protected control</p>
+                    <p class="text-[10px] text-gray-600 uppercase font-bold tracking-widest">Pattern-protected controls</p>
                 </div>
-                <div class="old-switch-wrap">
-                    <div class="old-switch lock-bounce" id="oldsw-pump" onclick="togglePump()">
-                        <div class="old-switch-screw tl"></div>
-                        <div class="sw-label sw-label-on">ON</div>
-                        <div class="old-switch-rocker"></div>
-                        <div class="sw-label sw-label-off">OFF</div>
-                        <div class="old-switch-screw br"></div>
-                    </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <button class="btn-start lock-bounce"
+                        onclick="askPattern('<?php echo $pump['start']; ?>', 'toggle', 'START PUMP', 'start')">
+                        <i class="fa-solid fa-play text-lg"></i>
+                        <span>START</span>
+                    </button>
+                    <button class="btn-stop lock-bounce"
+                        onclick="askPattern('<?php echo $pump['stop']; ?>', 'toggle', 'STOP PUMP', 'stop')">
+                        <i class="fa-solid fa-stop text-lg"></i>
+                        <span>STOP</span>
+                    </button>
                 </div>
-                <p class="text-[10px] text-gray-700 text-center mt-3">
+                <p class="text-[10px] text-gray-700 text-center mt-2">
                     <i class="fa-solid fa-shield-halved mr-1"></i>
-                    Flip requires pattern authentication · Monitoring is public
+                    Controls require pattern authentication · Monitoring is public
                 </p>
             </div>
         </div>
@@ -383,6 +392,7 @@ $otherSwitches = array_filter($controlEntities, fn($e) => $e['entity_type'] === 
         <?php
     }
 
+    renderSwitchGroup('Grid Control Center', 'fa-solid fa-plug-circle-bolt', 'bg-green-500/15 text-green-400', 'Inverter Grid Connections', $gridSwitches);
     renderSwitchGroup('Home Water Pump', 'fa-solid fa-water', 'bg-blue-500/15 text-blue-400', 'Site B · Water Pump', $homeWaterPump);
     renderSwitchGroup('Shop Light', 'fa-solid fa-lightbulb', 'bg-yellow-500/15 text-yellow-400', 'Site A · Lighting', $shopLights);
     renderSwitchGroup('Home Light', 'fa-solid fa-lightbulb', 'bg-yellow-500/15 text-yellow-400', 'Site B · Lighting', $homeLights);
@@ -503,6 +513,7 @@ const pumpEntities = {
 const dynEntities = <?php
     $map = [];
     foreach ($controlEntities as $e) { $map[$e['entity_key']] = $e['entity_id']; }
+    foreach ($gridSwitches as $e) { $map[$e['entity_key']] = $e['entity_id']; }
     echo json_encode($map);
 ?>;
 
@@ -683,8 +694,6 @@ function updatePumpStatus(state) {
     const bSub    = document.getElementById('banner-sub');
     const bIcon   = document.getElementById('banner-icon');
 
-    const oldSwPump = document.getElementById('oldsw-pump');
-
     if (state === 'on') {
         // Running
         if(led) { led.className = 'led-green'; }
@@ -696,7 +705,6 @@ function updatePumpStatus(state) {
         if(bTitle) bTitle.style.color = '#22c55e';
         if(bSub) bSub.textContent = 'Pump is active — consuming power';
         if(bIcon) bIcon.className = 'fa-solid fa-water text-2xl text-green-400 opacity-60';
-        if(oldSwPump) oldSwPump.classList.add('on');
     } else if (state === 'off') {
         // Stopped
         if(led) { led.className = 'led-red'; }
@@ -708,21 +716,9 @@ function updatePumpStatus(state) {
         if(bTitle) bTitle.style.color = '#ef4444';
         if(bSub) bSub.textContent = 'Pump is idle — no power draw';
         if(bIcon) bIcon.className = 'fa-solid fa-ban text-2xl text-red-400 opacity-40';
-        if(oldSwPump) oldSwPump.classList.remove('on');
     } else {
         if(led) led.className = 'led-gray';
         if(badgeTxt) badgeTxt.textContent = 'UNKNOWN';
-    }
-}
-
-// Flip the Shop pump switch: choose start or stop entity based on current visual state
-function togglePump() {
-    const sw = document.getElementById('oldsw-pump');
-    const isOn = sw && sw.classList.contains('on');
-    if (isOn) {
-        askPattern(pumpEntities.stop, 'toggle', 'STOP PUMP', 'stop');
-    } else {
-        askPattern(pumpEntities.start, 'toggle', 'START PUMP', 'start');
     }
 }
 
