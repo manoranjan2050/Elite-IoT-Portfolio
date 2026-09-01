@@ -42,6 +42,15 @@ $gridSwitches = [
 $isPumpEntity = fn($e) => $e['entity_type'] === 'switch' && stripos($e['friendly_name'] ?? $e['entity_key'], 'pump') !== false;
 $homeWaterPump = array_filter($controlEntities, fn($e) => $isPumpEntity($e) && $e['site'] === 'home');
 $shopLights    = array_filter($controlEntities, fn($e) => $e['entity_type'] === 'light' && $e['site'] === 'shop');
+
+// Shop front lighting - hardcoded (not yet in ha_entities admin table)
+$shopLightsExtra = [
+    ['entity_key' => 'shop_ceiling_light', 'entity_id' => 'switch.shop_control_1_front_ceiling_light', 'friendly_name' => 'Ceiling Light', 'icon' => 'fa-solid fa-lightbulb', 'color' => 'orange'],
+    ['entity_key' => 'shop_front_light',   'entity_id' => 'switch.shop_control_1_front_light',          'friendly_name' => 'Front Light',   'icon' => 'fa-solid fa-sun',      'color' => 'yellow'],
+    ['entity_key' => 'shop_rope_blue',     'entity_id' => 'switch.shop_control_1_front_rope_light_blue', 'friendly_name' => 'Blue Rope',     'icon' => 'fa-solid fa-grip-lines', 'color' => 'blue'],
+    ['entity_key' => 'shop_rope_green',    'entity_id' => 'switch.shop_control_1_front_rope_light_green','friendly_name' => 'Green Rope',    'icon' => 'fa-solid fa-grip-lines', 'color' => 'green'],
+];
+$shopLights = array_merge($shopLights, $shopLightsExtra);
 $homeLights    = array_filter($controlEntities, fn($e) => $e['entity_type'] === 'light' && $e['site'] === 'home');
 $otherSwitches = array_filter($controlEntities, fn($e) => $e['entity_type'] === 'switch' && !$isPumpEntity($e));
 ?>
@@ -362,8 +371,21 @@ $otherSwitches = array_filter($controlEntities, fn($e) => $e['entity_type'] === 
     </div>
 
     <?php
+    // Full literal Tailwind classes per color name (kept literal in source so the
+    // Tailwind content scanner picks them up - interpolated "text-{$color}-400"
+    // strings would NOT be detected by the build).
+    $switchIconColors = [
+        'orange' => 'bg-orange-500/15 text-orange-400',
+        'yellow' => 'bg-yellow-500/15 text-yellow-400',
+        'blue'   => 'bg-blue-500/15 text-blue-400',
+        'green'  => 'bg-green-500/15 text-green-400',
+        'purple' => 'bg-purple-500/15 text-purple-400',
+        'red'    => 'bg-red-500/15 text-red-400',
+    ];
+
     // Reusable renderer for a group of old-style rocker switch cards
     function renderSwitchGroup($title, $icon, $iconBg, $subtitle, $entities) {
+        global $switchIconColors;
         if (empty($entities)) return;
         ?>
         <div class="ctrl-section mb-8" data-aos="fade-up">
@@ -380,9 +402,15 @@ $otherSwitches = array_filter($controlEntities, fn($e) => $e['entity_type'] === 
             </div>
             <div class="p-5 md:p-7">
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <?php foreach ($entities as $e): $key = htmlspecialchars($e['entity_key']); ?>
+                    <?php foreach ($entities as $e): $key = htmlspecialchars($e['entity_key']);
+                        $entIconClass = $switchIconColors[$e['color'] ?? ''] ?? $iconBg;
+                        $entIcon = $e['icon'] ?? $icon;
+                    ?>
                     <div class="entity-card" id="dyn-card-<?php echo $key; ?>">
-                        <p class="text-xs font-bold text-white mb-3"><?php echo htmlspecialchars($e['friendly_name'] ?? $e['entity_key']); ?></p>
+                        <div class="w-9 h-9 rounded-xl <?php echo $entIconClass; ?> flex items-center justify-center mx-auto mb-2.5">
+                            <i class="<?php echo $entIcon; ?> text-sm"></i>
+                        </div>
+                        <p class="text-xs font-bold text-white mb-3 text-center"><?php echo htmlspecialchars($e['friendly_name'] ?? $e['entity_key']); ?></p>
                         <div class="old-switch-wrap">
                             <div class="old-switch lock-bounce" id="oldsw-<?php echo $key; ?>"
                                 onclick="askPattern('<?php echo htmlspecialchars($e['entity_id']); ?>', 'toggle', '<?php echo htmlspecialchars($e['friendly_name'] ?? $e['entity_key']); ?>', 'generic')">
@@ -524,6 +552,7 @@ const dynEntities = <?php
     $map = [];
     foreach ($controlEntities as $e) { $map[$e['entity_key']] = $e['entity_id']; }
     foreach ($gridSwitches as $e) { $map[$e['entity_key']] = $e['entity_id']; }
+    foreach ($shopLightsExtra as $e) { $map[$e['entity_key']] = $e['entity_id']; }
     echo json_encode($map);
 ?>;
 
