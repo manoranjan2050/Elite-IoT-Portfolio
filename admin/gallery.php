@@ -113,18 +113,19 @@ $items = $pdo->query("SELECT * FROM gallery ORDER BY display_order ASC, created_
                     <div class="relative group rounded-xl overflow-hidden border border-gray-800 aspect-square" id="gallery-card-<?php echo $item['id']; ?>">
                         <img src="../<?php echo htmlspecialchars($item['image_url']); ?>" class="w-full h-full object-cover <?php echo $item['show_in_gallery'] ? '' : 'opacity-40 grayscale'; ?>" id="gallery-img-<?php echo $item['id']; ?>">
 
-                        <!-- Visibility toggle - always visible, top-right -->
-                        <div class="absolute top-1.5 right-1.5 flex items-center gap-1 px-1.5 py-1 rounded-lg bg-black/70 backdrop-blur-sm">
+                        <!-- Visibility toggle - always visible, top-right (z-20 so the hover overlay below can't swallow its clicks).
+                             The whole pill is a <label> (not just the tiny switch) so the tap target is comfortably large on mobile. -->
+                        <label class="absolute top-1.5 right-1.5 z-20 flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-black/70 backdrop-blur-sm cursor-pointer">
                             <span class="text-[8px] font-bold uppercase <?php echo $item['show_in_gallery'] ? 'text-green-400' : 'text-gray-500'; ?>" id="gallery-visible-label-<?php echo $item['id']; ?>">
                                 <?php echo $item['show_in_gallery'] ? 'Live' : 'Hidden'; ?>
                             </span>
-                            <label class="toggle-switch toggle-switch-sm">
+                            <span class="toggle-switch toggle-switch-sm">
                                 <input type="checkbox" onchange="toggleGalleryVisible(<?php echo $item['id']; ?>, this)" <?php echo $item['show_in_gallery'] ? 'checked' : ''; ?>>
                                 <span class="toggle-slider"></span>
-                            </label>
-                        </div>
+                            </span>
+                        </label>
 
-                        <div class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center gap-2 p-2">
+                        <div class="absolute inset-0 z-10 bg-black/70 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center gap-2 p-2">
                             <span class="text-[10px] px-2 py-0.5 rounded-full <?php echo $item['category'] === 'project' ? 'bg-purple-500/30 text-purple-300' : 'bg-blue-500/30 text-blue-300'; ?>">
                                 <?php echo ucfirst($item['category']); ?>
                             </span>
